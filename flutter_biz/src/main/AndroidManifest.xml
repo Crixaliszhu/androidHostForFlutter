@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <application>
+        <!--
+          Flutter 容器 Activity。
+          - exported=true 仅为 demo 方便从 adb 启动。
+          - 主题继承自 host App，避免黑屏。生产代码会用 FlutterFragmentActivity 推荐的 windowBackground。
+        -->
+        <activity
+            android:name="com.example.flutterbiz.container.DemoFlutterActivity"
+            android:exported="true"
+            android:configChanges="orientation|keyboardHidden|keyboard|screenSize|locale|smallestScreenSize|layoutDirection|fontScale|uiMode"
+            android:hardwareAccelerated="true"
+            android:windowSoftInputMode="adjustResize" />
+    </application>
+</manifest>

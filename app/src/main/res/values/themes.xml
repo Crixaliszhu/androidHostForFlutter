@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--
+      Material3 主题。
+      MaterialButton / MaterialCardView 等组件强制要求 app 主题继承自
+      Theme.MaterialComponents 或 Theme.Material3，否则在 inflate 时
+      会抛 IllegalArgumentException。
+    -->
+    <style name="Theme.HybridDemo" parent="Theme.Material3.DayNight.NoActionBar" />
+</resources>

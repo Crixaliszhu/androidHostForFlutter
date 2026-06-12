@@ -1,0 +1,5 @@
+# 把当前文件复制为 local.properties 后填入真实路径。
+# Android SDK 路径
+sdk.dir=/Users/<you>/Library/Android/sdk
+# 同级 flutter_module 的绝对路径
+flutter.project.dir=/Users/<you>/AndroidStudioProjects/YuPaoProject/FlutterHybridDemo/flutter_module
