@@ -6,8 +6,8 @@ import com.example.flutterbiz.container.DemoFlutterActivity
 import com.example.flutterengine.entity.FlutterApiContext
 import com.example.flutterengine.entity.FlutterPageParams
 import com.example.flutterengine.manage.FlutterEngineManager
+import com.example.flutterengine.pigeon.RouteHostApi
 import com.example.flutterengine.registry.ApiRegistrar
-import io.flutter.plugin.common.MethodChannel
 
 /**
  * 路由 HostApi。
@@ -21,70 +21,57 @@ import io.flutter.plugin.common.MethodChannel
  * 自己维护 Activity 弱引用。
  */
 class RouterHostApiImpl(
-    private val context: FlutterApiContext,
-) : ApiRegistrar {
+    private val apiContext: FlutterApiContext,
+) : RouteHostApi, ApiRegistrar {
 
-    private fun currentActivity(): Activity? = FlutterEngineManager.getHostActivity(context.engineId)
+    private fun currentActivity(): Activity? = FlutterEngineManager.getHostActivity(apiContext.engineId)
 
     override fun register() {
-        val channel = MethodChannel(context.messenger, "com.example.hybriddemo/route")
-        channel.setMethodCallHandler { call, result ->
-            when (call.method) {
-                // Flutter 端路由栈只剩根路由时，主动调此方法通知原生关 Activity。
-                // 对应生产代码 `RouteAPI.removeFlutterContainer(instanceId: ...)`。
-                "removeFlutterContainer" -> {
-                    val activity = currentActivity()
-                    activity?.finish()
-                    result.success(null)
-                }
+        RouteHostApi.setUp(apiContext.messenger, this)
+    }
 
-                "pop" -> {
-                    val activity = currentActivity()
-                    val args = call.arguments as? Map<*, *>
-                    if (activity != null) {
-                        if (args != null) {
-                            val bundle = Bundle().apply {
-                                args.forEach { (k, v) ->
-                                    if (k is String && v != null) putString(k, v.toString())
-                                }
-                            }
-                            activity.intent?.putExtras(bundle)
-                            activity.setResult(Activity.RESULT_OK, activity.intent)
-                        }
-                        activity.finish()
+    override fun removeFlutterContainer(instanceId: String) {
+        currentActivity()?.finish()
+    }
+
+    override fun popRoute(arguments: Map<String?, Any?>?) {
+        val activity = currentActivity()
+        if (activity != null) {
+            if (arguments != null) {
+                val bundle = Bundle().apply {
+                    arguments.forEach { (k, v) ->
+                        if (k != null && v != null) putString(k, v.toString())
                     }
-                    result.success(null)
                 }
-
-                "pushNative" -> {
-                    // demo 简化：实际项目这里会调 ARouter 走原生路由表。
-                    val path = call.argument<String>("path").orEmpty()
-                    currentActivity()?.let { activity ->
-                        android.widget.Toast.makeText(
-                            activity,
-                            "原生收到 pushNative：$path",
-                            android.widget.Toast.LENGTH_SHORT,
-                        ).show()
-                    }
-                    result.success(null)
-                }
-
-                "pushFlutter" -> {
-                    val path = call.argument<String>("path").orEmpty()
-                    val args = call.argument<Map<String, Any?>>("arguments").orEmpty()
-                    val activity = currentActivity() ?: return@setMethodCallHandler result.success(null)
-                    val finalRoute = if (args.isEmpty()) path else
-                        "$path${if (path.contains("?")) "&" else "?"}" +
-                            args.entries.joinToString("&") { (k, v) -> "$k=$v" }
-                    DemoFlutterActivity.start(
-                        activity,
-                        FlutterPageParams(route = finalRoute, engineId = null),
-                    )
-                    result.success(null)
-                }
-
-                else -> result.notImplemented()
+                activity.intent?.putExtras(bundle)
+                activity.setResult(Activity.RESULT_OK, activity.intent)
             }
+            activity.finish()
         }
+    }
+
+    override fun pushNativeRoute(path: String, arguments: Map<String?, Any?>?) {
+        currentActivity()?.let { activity ->
+            android.widget.Toast.makeText(
+                activity,
+                "原生收到 pushNative：$path",
+                android.widget.Toast.LENGTH_SHORT,
+            ).show()
+        }
+    }
+
+    override fun pushFlutterRoute(path: String, arguments: Map<String?, Any?>?) {
+        val finalArgs = arguments.orEmpty()
+        val activity = currentActivity() ?: return
+        val finalRoute = if (finalArgs.isEmpty()) {
+            path
+        } else {
+            "$path${if (path.contains("?")) "&" else "?"}" +
+                finalArgs.entries.joinToString("&") { (k, v) -> "${k.orEmpty()}=$v" }
+        }
+        DemoFlutterActivity.start(
+            activity,
+            FlutterPageParams(route = finalRoute, engineId = null),
+        )
     }
 }

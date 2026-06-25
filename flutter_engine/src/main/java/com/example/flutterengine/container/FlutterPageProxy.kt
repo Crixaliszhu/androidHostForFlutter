@@ -77,7 +77,7 @@ class FlutterPageProxy(
     override fun onBackPressed(): Boolean {
         // 把 pop 动作交给 Flutter Navigator 处理。
         // Flutter 端 RouteStackObserver 会在栈里只剩根路由时，
-        // 主动调 RouteChannel.removeFlutterContainer(instanceId) 通知原生 finish Activity。
+        // 主动调 Pigeon RouteHostApi.removeFlutterContainer(instanceId) 通知原生 finish Activity。
         // 这样 Flutter 完全掌控路由栈，不会出现白屏。
         val engine = FlutterEngineManager.getFlutterEngine(engineId) ?: return false
         return runCatching { engine.navigationChannel.popRoute() }.isSuccess

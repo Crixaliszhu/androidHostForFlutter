@@ -9,7 +9,7 @@ import com.example.flutterengine.manage.FlutterEngineManager
  * 调用方不直接接触 BinaryMessenger。
  */
 object EventApiCaller {
-    /** 推一个简单事件。Flutter 端 `EventChannelBridge` 会收到。 */
+    /** 推一个简单事件。Flutter 端 Pigeon `EventFlutterApi` handler 会收到。 */
     fun sendTick() {
         FlutterEngineManager.sendEventToAllEngines(
             eventName = "tick",

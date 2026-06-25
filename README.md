@@ -179,13 +179,13 @@ Flutter 端需要：
 
 ### 9. 建立 Native 与 Flutter 通信
 
-demo 使用 `MethodChannel` 手写，语义上对应生产项目 Pigeon：
+demo 直接使用 Pigeon，语义与生产项目保持一致：
 
 - Flutter -> Native：HostApi，例如 Toast、DeviceInfo、Router。
 - Native -> Flutter：FlutterApi，例如推送事件、通知页面结果。
 - 通道注册时机：每个 FlutterEngine 创建完成后，用该 engine 的 `binaryMessenger` 注册。
 
-生产迁移时，把手写 channel 替换为 Pigeon：
+核心协议定义：
 
 ```dart
 @HostApi()
@@ -195,7 +195,7 @@ abstract class ToastHostApi {
 
 @FlutterApi()
 abstract class EventFlutterApi {
-  void onReceiveEvent(String name, Map<String, Object?> arguments);
+  void onReceiveEvent(NativeEvent event);
 }
 ```
 

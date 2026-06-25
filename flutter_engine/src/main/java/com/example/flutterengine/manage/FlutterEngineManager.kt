@@ -7,11 +7,12 @@ import com.example.flutterengine.config.FlutterConstants
 import com.example.flutterengine.entity.FlutterApiContext
 import com.example.flutterengine.entity.FlutterEngineEntity
 import com.example.flutterengine.entity.FlutterPageEntity
+import com.example.flutterengine.pigeon.EventFlutterApi
+import com.example.flutterengine.pigeon.NativeEvent
 import com.example.flutterengine.registry.ApiRegistrar
 import com.example.flutterengine.registry.FlutterApiRegistry
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.BinaryMessenger
-import io.flutter.plugin.common.MethodChannel
 import kotlin.reflect.KClass
 
 /**
@@ -133,16 +134,21 @@ object FlutterEngineManager {
     /**
      * 向所有 Flutter 引擎广播事件（Native → Flutter 单向）。
      *
-     * Flutter 端在 `event_channel.dart` 里监听 `onReceiveEvent`。
-     * 真实项目用 Pigeon 的 `EventFlutterAPI.onReceiveEvent`，原理一致。
+     * Flutter 端在 Pigeon `EventFlutterApi` handler 里监听。
      */
     fun sendEventToAllEngines(eventName: String, arguments: Map<String, Any?>? = null) {
         getAllBinaryMessenger().forEach { msg ->
-            val ch = MethodChannel(msg, "com.example.hybriddemo/event")
-            ch.invokeMethod("onReceiveEvent", mapOf(
-                "name" to eventName,
-                "arguments" to (arguments ?: emptyMap<String, Any?>()),
-            ))
+            val payload: Map<String?, Any?> = arguments?.mapKeys { it.key } ?: emptyMap()
+            EventFlutterApi(msg).onReceiveEvent(
+                NativeEvent(
+                    name = eventName,
+                    arguments = payload,
+                )
+            ) { result ->
+                result.exceptionOrNull()?.let {
+                    Log.e(TAG, "sendEventToAllEngines failed: ${it.message}")
+                }
+            }
         }
     }
 
