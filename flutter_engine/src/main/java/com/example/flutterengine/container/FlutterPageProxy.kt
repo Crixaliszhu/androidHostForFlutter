@@ -75,13 +75,11 @@ class FlutterPageProxy(
     }
 
     override fun onBackPressed(): Boolean {
-        // 由 Flutter NavigationChannel 处理 pop；
-        // 但 NavigationChannel.popRoute 最终会在 Flutter 端 pop 最后一个路由时
-        // 回调 SystemNavigator.pop()，也就是 Activity.finish()。
-        // 如果 Flutter 里只有一个路由（即本页面），popRoute 后 Navigator 为空会白屏。
-        // 正确做法：直接 finish Activity，让引擎保留但容器关闭。
-        // 生产代码的 popRoute 逻辑在 Flutter 端有「路由栈 ≤1 时 removeFlutterContainer」的兜底，
-        // 这里 Demo 简化为：始终由原生侧 finish。
-        return false // 返回 false，让 BaseFlutterActivity 的 onBackPressed 走 finish()
+        // 把 pop 动作交给 Flutter Navigator 处理。
+        // Flutter 端 RouteStackObserver 会在栈里只剩根路由时，
+        // 主动调 RouteChannel.removeFlutterContainer(instanceId) 通知原生 finish Activity。
+        // 这样 Flutter 完全掌控路由栈，不会出现白屏。
+        val engine = FlutterEngineManager.getFlutterEngine(engineId) ?: return false
+        return runCatching { engine.navigationChannel.popRoute() }.isSuccess
     }
 }

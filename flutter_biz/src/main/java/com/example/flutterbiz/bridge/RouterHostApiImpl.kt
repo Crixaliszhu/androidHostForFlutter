@@ -30,6 +30,14 @@ class RouterHostApiImpl(
         val channel = MethodChannel(context.messenger, "com.example.hybriddemo/route")
         channel.setMethodCallHandler { call, result ->
             when (call.method) {
+                // Flutter 端路由栈只剩根路由时，主动调此方法通知原生关 Activity。
+                // 对应生产代码 `RouteAPI.removeFlutterContainer(instanceId: ...)`。
+                "removeFlutterContainer" -> {
+                    val activity = currentActivity()
+                    activity?.finish()
+                    result.success(null)
+                }
+
                 "pop" -> {
                     val activity = currentActivity()
                     val args = call.arguments as? Map<*, *>
