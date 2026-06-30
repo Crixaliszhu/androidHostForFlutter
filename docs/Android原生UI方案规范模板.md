@@ -484,7 +484,196 @@ flowchart TD
 
 这条顺序的重点不是“迁得快”，而是“迁得稳”。
 
-## 14. 最终建议
+## 14. 页面评审示例：HistoryRelease 三方案对比
+
+这一节直接用本次 demo 的 `HistoryRelease` 三页做一份实战评审样例。
+
+目标不是评价“哪一页写得更漂亮”，而是演示正式项目里应该如何做 UI 技术方案评审。
+
+### 14.1 页面背景
+
+评审对象是同一份业务页面：
+
+- 招工状态标签
+- 标题、薪资、地点、发布时间、人数
+- 置顶到期信息
+- 多个操作按钮
+- 操作日志区域
+
+三种实现分别是：
+
+- `DataBinding`
+  [HistoryReleaseDataBindingActivity.kt](/Users/ypmma106/AndroidStudioProjects/YuPaoProject/FlutterHybridDemo/android_host/app/src/main/java/com/example/hybriddemo/historyrelease/ui/HistoryReleaseDataBindingActivity.kt)
+- `ViewBinding`
+  [HistoryReleaseViewBindingActivity.kt](/Users/ypmma106/AndroidStudioProjects/YuPaoProject/FlutterHybridDemo/android_host/app/src/main/java/com/example/hybriddemo/historyrelease/ui/HistoryReleaseViewBindingActivity.kt)
+- `Compose`
+  [HistoryReleaseComposeActivity.kt](/Users/ypmma106/AndroidStudioProjects/YuPaoProject/FlutterHybridDemo/android_host/app/src/main/java/com/example/hybriddemo/historyrelease/ui/HistoryReleaseComposeActivity.kt)
+
+三页共享同一份状态层：
+
+- [HistoryReleaseDemoViewModel.kt](/Users/ypmma106/AndroidStudioProjects/YuPaoProject/FlutterHybridDemo/android_host/app/src/main/java/com/example/hybriddemo/historyrelease/presentation/HistoryReleaseDemoViewModel.kt)
+- [HistoryReleaseDemoStateFactory.kt](/Users/ypmma106/AndroidStudioProjects/YuPaoProject/FlutterHybridDemo/android_host/app/src/main/java/com/example/hybriddemo/historyrelease/domain/HistoryReleaseDemoStateFactory.kt)
+
+这保证了评审时我们讨论的是 UI 技术本身，而不是状态模型差异。
+
+### 14.2 评审结论
+
+如果这是正式项目里的一个新页面，推荐结论是：
+
+`优先选择 Compose。`
+
+如果这是一个已经在线、后续还会持续维护的 XML 存量页面，推荐结论是：
+
+`优先选择 ViewBinding。`
+
+如果这是一个已有大量 DataBinding 依赖、当前迭代只做小改动的存量页，推荐结论是：
+
+`允许继续维护 DataBinding，但不建议继续扩散。`
+
+### 14.3 为什么 Compose 是新页面首选
+
+从这份页面的结构看，它具备 Compose 的典型适配特征：
+
+- 明显是状态驱动页面
+- 操作区按钮显隐完全依赖 `UiState`
+- 页面结构可以自然拆成卡片、状态标签、按钮区、日志区
+- 后续如果增加更多状态和组件，Compose 扩展成本更低
+
+在当前实现中，对应体现是：
+
+- Activity 容器只做 `setContent`
+- 页面渲染集中在 `HistoryReleaseComposePage`
+- 所有交互事件都通过 lambda 注入
+
+见：
+[HistoryReleaseComposeActivity.kt](/Users/ypmma106/AndroidStudioProjects/YuPaoProject/FlutterHybridDemo/android_host/app/src/main/java/com/example/hybriddemo/historyrelease/ui/HistoryReleaseComposeActivity.kt)
+
+这符合正式项目对新页面的推荐边界。
+
+### 14.4 为什么 ViewBinding 是存量 XML 页首选
+
+`ViewBinding` 版本最适合作为“已有 XML 页面长期维护”的标准方案。
+
+原因很直接：
+
+- 所有 View 引用安全且明确
+- 点击逻辑集中在 `bindActions()`
+- 状态观察集中在 `observeState()`
+- 页面渲染集中在 `render(state)`
+
+这使得排障路径很清晰：
+
+`状态变化 -> observe -> render -> View 更新`
+
+对应代码：
+[HistoryReleaseViewBindingActivity.kt](/Users/ypmma106/AndroidStudioProjects/YuPaoProject/FlutterHybridDemo/android_host/app/src/main/java/com/example/hybriddemo/historyrelease/ui/HistoryReleaseViewBindingActivity.kt)
+
+对于正式项目中的大量 XML 存量页，这是最稳、最容易团队统一的写法。
+
+### 14.5 为什么 DataBinding 不适合继续作为默认方案
+
+`DataBinding` 版本并不是不能用，它也能把页面跑起来。
+
+但从正式项目评审角度看，它的问题也很典型：
+
+- 页面逻辑被分散到 XML 和 Kotlin 两侧
+- 点击能力通过 `ActionProxy` 转发
+- 显隐和样式逻辑部分放进绑定表达式和 `BindingAdapter`
+- 调试路径天然比 `ViewBinding` 更长
+
+对应代码：
+[HistoryReleaseDataBindingActivity.kt](/Users/ypmma106/AndroidStudioProjects/YuPaoProject/FlutterHybridDemo/android_host/app/src/main/java/com/example/hybriddemo/historyrelease/ui/HistoryReleaseDataBindingActivity.kt)
+
+再结合 XML：
+[activity_history_release_data_binding.xml](/Users/ypmma106/AndroidStudioProjects/YuPaoProject/FlutterHybridDemo/android_host/app/src/main/res/layout/activity_history_release_data_binding.xml)
+
+在这个 demo 里它仍然可控，是因为我们刻意限制了表达式复杂度。
+
+但正式项目一旦多人协作、持续迭代，DataBinding 很容易继续向复杂表达式膨胀，这就是不建议再作为默认方案的原因。
+
+### 14.6 三种方案在本页中的优劣对比
+
+#### DataBinding
+
+优点：
+
+- XML 绑定后页面样板代码少
+- 简单字段绑定很直接
+- 适合短期维护已有页面
+
+问题：
+
+- 逻辑容易分散
+- 编译期和生成代码问题排障更重
+- 表达式复杂度容易失控
+
+#### ViewBinding
+
+优点：
+
+- 结构最稳
+- 调试最直接
+- 最适合存量 XML 团队统一规范
+
+问题：
+
+- 渲染代码相对更多
+- 页面很大时 `render(state)` 容易变长，需要继续组件拆分
+
+#### Compose
+
+优点：
+
+- 最符合状态驱动页面
+- 组件化和后续扩展更自然
+- 新页面长期收益最高
+
+问题：
+
+- 需要团队具备 Compose 基础设施和经验
+- 与历史 View 体系深度耦合时改造成本更高
+
+### 14.7 如果这是正式项目，最终会怎么定
+
+可以把正式评审结论写成下面这种格式：
+
+#### 评审结论
+
+- 若为新页面：选 `Compose`
+- 若为现有 XML 页重构：选 `ViewBinding`
+- 若为存量小改：允许继续 `DataBinding`，但禁止新增复杂表达式
+
+#### 评审理由
+
+- 页面具备明确 `UiState`
+- 页面属于典型状态驱动展示
+- 交互动作较多，适合统一事件入口
+- 后续维护成本是主要考量，而不是初始代码量最少
+
+#### 风险提示
+
+- 若直接在存量 DataBinding 大页上边做需求边迁 Compose，风险较高
+- 若页面仍大量依赖老 View 生态，应先 ViewBinding 收口
+- 若团队暂无 Compose 维护经验，新页面也要评估节奏，不应强推
+
+### 14.8 这份评审示例可以怎么复用
+
+正式项目里，后续每做一个页面评审，都可以按这个结构产出：
+
+1. 页面背景
+2. 当前状态层是否清晰
+3. 三种方案中谁更适合
+4. 推荐结论
+5. 风险与迁移建议
+
+这样做的价值是：
+
+- 页面选型不再停留在个人偏好
+- 评审记录可沉淀
+- 后续重构有依据
+- 团队标准会越来越一致
+
+## 15. 最终建议
 
 对鱼泡这类大型混合 Android 项目，更务实也更接近最佳实践的路线不是“一刀切全换”，而是：
 
