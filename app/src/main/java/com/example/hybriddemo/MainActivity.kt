@@ -10,6 +10,7 @@ import com.example.hybriddemo.databinding.ActivityMainBinding
 import com.example.hybriddemo.historyrelease.ui.HistoryReleaseComposeActivity
 import com.example.hybriddemo.historyrelease.ui.HistoryReleaseDataBindingActivity
 import com.example.hybriddemo.historyrelease.ui.HistoryReleaseViewBindingActivity
+import com.example.hybriddemo.storage.demo.StorageBestPracticeActivity
 
 /**
  * 宿主 App 主页面。
@@ -62,6 +63,10 @@ class MainActivity : AppCompatActivity() {
 
         binding.btnOpenHistoryCompose.setOnClickListener {
             startActivity(Intent(this, HistoryReleaseComposeActivity::class.java))
+        }
+
+        binding.btnOpenStorageBestPractice.setOnClickListener {
+            startActivity(Intent(this, StorageBestPracticeActivity::class.java))
         }
     }
 }

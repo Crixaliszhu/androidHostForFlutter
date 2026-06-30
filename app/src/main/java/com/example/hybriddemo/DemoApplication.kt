@@ -2,6 +2,7 @@ package com.example.hybriddemo
 
 import android.app.Application
 import com.example.flutterbiz.DemoFlutterInitManager
+import com.tencent.mmkv.MMKV
 
 /**
  * 宿主 App Application。
@@ -12,6 +13,7 @@ import com.example.flutterbiz.DemoFlutterInitManager
 class DemoApplication : Application() {
     override fun onCreate() {
         super.onCreate()
+        MMKV.initialize(this)
         // 触发：
         //  - FlutterEngineManager.init(...)
         //  - 注册业务 HostApi 工厂 + Provider

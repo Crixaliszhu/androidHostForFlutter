@@ -10,6 +10,7 @@
             name="vm"
             type="com.example.hybriddemo.historyrelease.presentation.HistoryReleaseDemoViewModel" />
 
+        <!-- 直接使用 ViewModel也可以 -->
         <variable
             name="action"
             type="com.example.hybriddemo.historyrelease.presentation.HistoryReleaseDemoActionProxy" />

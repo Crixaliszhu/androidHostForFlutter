@@ -1,7 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="match_parent">
+
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
     android:orientation="vertical"
     android:padding="16dp">
 
@@ -69,7 +73,24 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="24dp"
         android:padding="8dp"
+        android:text="Android 本地存储封装规范 Demo"
+        android:textSize="18sp"
+        android:textStyle="bold" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnOpenStorageBestPractice"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:text="⑦ MMKV / DataStore / Room 封装模板" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:padding="8dp"
         android:textColor="#666"
         android:text="提示：先点①打开首页，再回到这里点③，可以在首页看到 tick 计数 +1。" />
 
 </LinearLayout>
+</ScrollView>

@@ -20,5 +20,6 @@
         <activity android:name=".historyrelease.ui.HistoryReleaseDataBindingActivity" />
         <activity android:name=".historyrelease.ui.HistoryReleaseViewBindingActivity" />
         <activity android:name=".historyrelease.ui.HistoryReleaseComposeActivity" />
+        <activity android:name=".storage.demo.StorageBestPracticeActivity" />
     </application>
 </manifest>
