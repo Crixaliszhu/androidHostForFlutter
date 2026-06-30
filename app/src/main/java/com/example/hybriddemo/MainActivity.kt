@@ -1,11 +1,15 @@
 package com.example.hybriddemo
 
 import android.os.Bundle
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import com.example.flutterbiz.api.IFlutterRouterService
 import com.example.flutterbiz.api.ServiceLocator
 import com.example.flutterbiz.bridge.EventApiCaller
 import com.example.hybriddemo.databinding.ActivityMainBinding
+import com.example.hybriddemo.historyrelease.ui.HistoryReleaseComposeActivity
+import com.example.hybriddemo.historyrelease.ui.HistoryReleaseDataBindingActivity
+import com.example.hybriddemo.historyrelease.ui.HistoryReleaseViewBindingActivity
 
 /**
  * 宿主 App 主页面。
@@ -46,6 +50,18 @@ class MainActivity : AppCompatActivity() {
         binding.btnPushTick.setOnClickListener {
             // 跨引擎广播：所有正在显示的 Flutter 页面（home 监听了）都会 +1。
             EventApiCaller.sendTick()
+        }
+
+        binding.btnOpenHistoryDataBinding.setOnClickListener {
+            startActivity(Intent(this, HistoryReleaseDataBindingActivity::class.java))
+        }
+
+        binding.btnOpenHistoryViewBinding.setOnClickListener {
+            startActivity(Intent(this, HistoryReleaseViewBindingActivity::class.java))
+        }
+
+        binding.btnOpenHistoryCompose.setOnClickListener {
+            startActivity(Intent(this, HistoryReleaseComposeActivity::class.java))
         }
     }
 }

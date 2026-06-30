@@ -39,6 +39,36 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="24dp"
         android:padding="8dp"
+        android:text="HistoryReleaseFragment 三种原生 UI 方案对比"
+        android:textSize="18sp"
+        android:textStyle="bold" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnOpenHistoryDataBinding"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:text="④ DataBinding 版本" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnOpenHistoryViewBinding"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:text="⑤ ViewBinding 版本" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnOpenHistoryCompose"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:text="⑥ Compose 版本" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:padding="8dp"
         android:textColor="#666"
         android:text="提示：先点①打开首页，再回到这里点③，可以在首页看到 tick 计数 +1。" />
 

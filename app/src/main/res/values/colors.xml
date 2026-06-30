@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="history_release_status_green">#06B578</color>
+    <color name="history_release_status_gray">#98A1B2</color>
+</resources>
