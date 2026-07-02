@@ -1,5 +1,7 @@
 package com.example.hybriddemo.storage.room
 
+import com.example.hybriddemo.storage.room.dao.RecruitHistoryDao
+import com.example.hybriddemo.storage.room.table.RecruitHistoryEntity
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest

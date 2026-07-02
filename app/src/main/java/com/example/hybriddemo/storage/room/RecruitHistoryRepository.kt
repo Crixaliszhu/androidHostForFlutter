@@ -1,10 +1,13 @@
 package com.example.hybriddemo.storage.room
 
+import com.example.hybriddemo.storage.room.dao.RecruitHistoryDao
+import com.example.hybriddemo.storage.room.table.RecruitHistoryEntity
 import kotlinx.coroutines.flow.Flow
 
 class RecruitHistoryRepository(
     private val dao: RecruitHistoryDao,
 ) {
+
     fun observeHistory(): Flow<List<RecruitHistoryEntity>> {
         return dao.observeAll()
     }
