@@ -3,10 +3,12 @@ package com.example.hybriddemo.historyrelease.presentation
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.hybriddemo.historyrelease.data.FakeHistoryReleaseDemoRepository
 import com.example.hybriddemo.historyrelease.data.HistoryReleaseDemoRepository
 import com.example.hybriddemo.historyrelease.domain.HistoryReleaseDemoStateFactory
 import com.example.hybriddemo.historyrelease.model.HistoryReleaseDemoUiState
+import com.example.hybriddemo.xbus.XBus
 
 class HistoryReleaseDemoViewModel(
     private val repository: HistoryReleaseDemoRepository = FakeHistoryReleaseDemoRepository(),

@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">FlutterHybridDemo</string>
+    <string name="title_activity_xbus_main">XBusMainActivity</string>
+    <string name="title_activity_xbus_send">XBusSendActivity</string>
 </resources>

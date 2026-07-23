@@ -11,6 +11,7 @@ import com.example.hybriddemo.historyrelease.ui.HistoryReleaseComposeActivity
 import com.example.hybriddemo.historyrelease.ui.HistoryReleaseDataBindingActivity
 import com.example.hybriddemo.historyrelease.ui.HistoryReleaseViewBindingActivity
 import com.example.hybriddemo.storage.demo.StorageBestPracticeActivity
+import com.example.hybriddemo.xbus.XBusMainActivity
 
 /**
  * 宿主 App 主页面。
@@ -67,6 +68,10 @@ class MainActivity : AppCompatActivity() {
 
         binding.btnOpenStorageBestPractice.setOnClickListener {
             startActivity(Intent(this, StorageBestPracticeActivity::class.java))
+        }
+
+        binding.btnXbusMain.setOnClickListener {
+            startActivity(Intent(this, XBusMainActivity::class.java))
         }
     }
 }
