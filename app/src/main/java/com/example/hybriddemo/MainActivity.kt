@@ -10,6 +10,7 @@ import com.example.hybriddemo.databinding.ActivityMainBinding
 import com.example.hybriddemo.historyrelease.ui.HistoryReleaseComposeActivity
 import com.example.hybriddemo.historyrelease.ui.HistoryReleaseDataBindingActivity
 import com.example.hybriddemo.historyrelease.ui.HistoryReleaseViewBindingActivity
+import com.example.hybriddemo.service.page.ServiceDemoActivity
 import com.example.hybriddemo.storage.demo.StorageBestPracticeActivity
 import com.example.hybriddemo.xbus.XBusMainActivity
 
@@ -72,6 +73,10 @@ class MainActivity : AppCompatActivity() {
 
         binding.btnXbusMain.setOnClickListener {
             startActivity(Intent(this, XBusMainActivity::class.java))
+        }
+
+        binding.btnService.setOnClickListener {
+            startActivity(Intent(this, ServiceDemoActivity::class.java))
         }
     }
 }
