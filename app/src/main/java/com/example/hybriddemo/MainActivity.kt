@@ -10,6 +10,7 @@ import com.example.hybriddemo.databinding.ActivityMainBinding
 import com.example.hybriddemo.historyrelease.ui.HistoryReleaseComposeActivity
 import com.example.hybriddemo.historyrelease.ui.HistoryReleaseDataBindingActivity
 import com.example.hybriddemo.historyrelease.ui.HistoryReleaseViewBindingActivity
+import com.example.hybriddemo.ipc.ui.IpcDemoActivity
 import com.example.hybriddemo.service.page.ServiceDemoActivity
 import com.example.hybriddemo.service.workmanager.WorkManagerDemoActivity
 import com.example.hybriddemo.storage.demo.StorageBestPracticeActivity
@@ -82,6 +83,10 @@ class MainActivity : AppCompatActivity() {
 
         binding.btnWorkManager.setOnClickListener {
             startActivity(Intent(this, WorkManagerDemoActivity::class.java))
+        }
+
+        binding.btnServiceMessenger.setOnClickListener {
+            startActivity(Intent(this, IpcDemoActivity::class.java))
         }
     }
 }

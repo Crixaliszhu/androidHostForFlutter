@@ -4,6 +4,7 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
+
     <application
         android:name=".DemoApplication"
         android:allowBackup="true"
@@ -18,6 +19,11 @@
             android:name="com.example.hybriddemo.service.bind_ervice.FloatDemoService"
             android:exported="false"
             android:foregroundServiceType="specialUse" />
+        <service
+            android:name="com.example.hybriddemo.ipc.service.MessengerLongService"
+            android:process=":ffmpge"
+            android:exported="false"/>
+
         <activity
             android:name=".service.workmanager.WorkManagerDemoActivity"
             android:exported="false" />
@@ -47,6 +53,7 @@
         <activity android:name=".historyrelease.ui.HistoryReleaseViewBindingActivity" />
         <activity android:name=".historyrelease.ui.HistoryReleaseComposeActivity" />
         <activity android:name=".storage.demo.StorageBestPracticeActivity" />
+        <activity android:name="com.example.hybriddemo.ipc.ui.IpcDemoActivity" />
     </application>
 
 </manifest>

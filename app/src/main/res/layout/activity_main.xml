@@ -89,6 +89,13 @@
             android:layout_marginTop="12dp"
             android:text="展示WorkManager媒体上传" />
 
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnServiceMessenger"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:text="展示进程通讯-Messenger" />
+
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
