@@ -18,7 +18,9 @@
             android:name="com.example.hybriddemo.service.bind_ervice.FloatDemoService"
             android:exported="false"
             android:foregroundServiceType="specialUse" />
-
+        <activity
+            android:name=".service.workmanager.WorkManagerDemoActivity"
+            android:exported="false" />
         <activity
             android:name=".service.page.ServiceDemoActivity"
             android:exported="false" />
