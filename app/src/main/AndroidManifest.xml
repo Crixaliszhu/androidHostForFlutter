@@ -4,6 +4,11 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
+    <!-- MediaStore 查询图片需要的权限 -->
+    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
+    <uses-permission
+        android:name="android.permission.READ_EXTERNAL_STORAGE"
+        android:maxSdkVersion="32" />
 
     <application
         android:name=".DemoApplication"
@@ -24,6 +29,9 @@
             android:process=":ffmpge"
             android:exported="false"/>
 
+        <activity
+            android:name=".mediastore.PhotoPickerDemoActivity"
+            android:exported="false" />
         <activity
             android:name=".service.workmanager.WorkManagerDemoActivity"
             android:exported="false" />

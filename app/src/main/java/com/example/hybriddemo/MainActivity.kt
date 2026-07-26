@@ -11,6 +11,7 @@ import com.example.hybriddemo.historyrelease.ui.HistoryReleaseComposeActivity
 import com.example.hybriddemo.historyrelease.ui.HistoryReleaseDataBindingActivity
 import com.example.hybriddemo.historyrelease.ui.HistoryReleaseViewBindingActivity
 import com.example.hybriddemo.ipc.ui.IpcDemoActivity
+import com.example.hybriddemo.mediastore.PhotoPickerDemoActivity
 import com.example.hybriddemo.service.page.ServiceDemoActivity
 import com.example.hybriddemo.service.workmanager.WorkManagerDemoActivity
 import com.example.hybriddemo.storage.demo.StorageBestPracticeActivity
@@ -83,6 +84,10 @@ class MainActivity : AppCompatActivity() {
 
         binding.btnWorkManager.setOnClickListener {
             startActivity(Intent(this, WorkManagerDemoActivity::class.java))
+        }
+
+        binding.btnPhotoPicker.setOnClickListener {
+            startActivity(Intent(this, PhotoPickerDemoActivity::class.java))
         }
 
         binding.btnServiceMessenger.setOnClickListener {
