@@ -1,52 +1,85 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:padding="16dp">
+    android:layout_height="match_parent">
 
-    <TextView
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Memory Profiler 内存泄漏示例"
-        android:textSize="20sp"
-        android:textStyle="bold" />
+        android:orientation="vertical"
+        android:padding="16dp">
 
-    <TextView
-        android:id="@+id/tvLeakStatus"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="12dp"
-        android:text="点击制造泄漏后返回首页，再用 Android Studio Memory Profiler 抓 Heap Dump。"
-        android:textColor="#555555"
-        android:textSize="15sp" />
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Memory Profiler 常见内存占用示例"
+            android:textSize="20sp"
+            android:textStyle="bold" />
 
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/btnCreateLeak"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
-        android:text="制造 Activity 泄漏" />
+        <TextView
+            android:id="@+id/tvLeakStatus"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:text="打开 Android Studio Profiler 的 View Live Telemetry 后，依次点击下面按钮观察实时内存曲线；需要定位对象时再抓 Heap Dump。"
+            android:textColor="#555555"
+            android:textSize="15sp" />
 
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/btnFinishPage"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="12dp"
-        android:text="关闭页面" />
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnCreateLeak"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:text="制造 Activity 泄漏" />
 
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/btnClearLeak"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="12dp"
-        android:text="清理示例泄漏" />
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnAddJavaHeap"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:text="增加 Java Heap 大对象" />
 
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/btnRequestGc"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="12dp"
-        android:text="请求 GC" />
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnAddBitmap"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:text="增加 Bitmap 图片内存" />
 
-</LinearLayout>
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnAddNativeBuffer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:text="增加 Native DirectBuffer" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnStartThreads"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:text="启动常驻线程" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnFinishPage"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:text="关闭页面" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnClearLeak"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:text="清理全部示例内存" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnRequestGc"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:text="请求 GC" />
+
+    </LinearLayout>
+</ScrollView>
