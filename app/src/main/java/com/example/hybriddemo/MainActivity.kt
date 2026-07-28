@@ -13,6 +13,8 @@ import com.example.hybriddemo.historyrelease.ui.HistoryReleaseDataBindingActivit
 import com.example.hybriddemo.historyrelease.ui.HistoryReleaseViewBindingActivity
 import com.example.hybriddemo.ipc.ui.IpcDemoActivity
 import com.example.hybriddemo.mediastore.PhotoPickerDemoActivity
+import com.example.hybriddemo.performance.JankOnEnterActivity
+import com.example.hybriddemo.performance.MemoryLeakDemoActivity
 import com.example.hybriddemo.service.page.ServiceDemoActivity
 import com.example.hybriddemo.service.workmanager.WorkManagerDemoActivity
 import com.example.hybriddemo.storage.demo.StorageBestPracticeActivity
@@ -97,6 +99,14 @@ class MainActivity : AppCompatActivity() {
 
         binding.btnServiceMessenger.setOnClickListener {
             startActivity(Intent(this, IpcDemoActivity::class.java))
+        }
+
+        binding.btnOpenJankOnEnter.setOnClickListener {
+            startActivity(Intent(this, JankOnEnterActivity::class.java))
+        }
+
+        binding.btnOpenMemoryLeakDemo.setOnClickListener {
+            startActivity(Intent(this, MemoryLeakDemoActivity::class.java))
         }
     }
 

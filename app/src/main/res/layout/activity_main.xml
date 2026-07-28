@@ -103,6 +103,20 @@
             android:layout_marginTop="12dp"
             android:text="展示进程通讯-Messenger" />
 
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnOpenJankOnEnter"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:text="进入页面卡顿示例（主线程反例）" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnOpenMemoryLeakDemo"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:text="Memory Profiler 内存泄漏示例" />
+
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

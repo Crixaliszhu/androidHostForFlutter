@@ -61,6 +61,8 @@
         <activity android:name=".historyrelease.ui.HistoryReleaseViewBindingActivity" />
         <activity android:name=".historyrelease.ui.HistoryReleaseComposeActivity" />
         <activity android:name=".storage.demo.StorageBestPracticeActivity" />
+        <activity android:name=".performance.JankOnEnterActivity" />
+        <activity android:name=".performance.MemoryLeakDemoActivity" />
         <activity android:name="com.example.hybriddemo.ipc.ui.IpcDemoActivity" />
     </application>
 
