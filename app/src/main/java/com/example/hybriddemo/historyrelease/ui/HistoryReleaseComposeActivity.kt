@@ -1,6 +1,7 @@
 package com.example.hybriddemo.historyrelease.ui
 
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
@@ -23,7 +24,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
@@ -31,6 +34,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.runtime.livedata.observeAsState
 import com.example.hybriddemo.historyrelease.model.HistoryReleaseDemoUiState
+import com.example.hybriddemo.historyrelease.presentation.HistoryReleaseDemoEvent
 import com.example.hybriddemo.historyrelease.presentation.HistoryReleaseDemoViewModel
 
 class HistoryReleaseComposeActivity : ComponentActivity() {
@@ -42,8 +46,22 @@ class HistoryReleaseComposeActivity : ComponentActivity() {
         setContent {
             MaterialTheme {
                 Surface {
+                    val context = LocalContext.current
                     val state by vm.uiState.observeAsState()
                     val actionLog by vm.actionLog.observeAsState("等待操作")
+                    LaunchedEffect(vm) {
+                        vm.events.collect { event ->
+                            when (event) {
+                                is HistoryReleaseDemoEvent.Toast -> {
+                                    Toast.makeText(
+                                        context,
+                                        event.message,
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                }
+                            }
+                        }
+                    }
                     state?.let {
                         HistoryReleaseComposePage(
                             state = it,

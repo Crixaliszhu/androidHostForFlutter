@@ -3,6 +3,7 @@ package com.example.hybriddemo
 import android.os.Bundle
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.coroutineScope
 import com.example.flutterbiz.api.IFlutterRouterService
 import com.example.flutterbiz.api.ServiceLocator
 import com.example.flutterbiz.bridge.EventApiCaller
@@ -16,6 +17,10 @@ import com.example.hybriddemo.service.page.ServiceDemoActivity
 import com.example.hybriddemo.service.workmanager.WorkManagerDemoActivity
 import com.example.hybriddemo.storage.demo.StorageBestPracticeActivity
 import com.example.hybriddemo.xbus.XBusMainActivity
+import kotlinx.coroutines.NonCancellable
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import org.jetbrains.annotations.ApiStatus.NonExtendable
 
 /**
  * 宿主 App 主页面。
@@ -93,5 +98,22 @@ class MainActivity : AppCompatActivity() {
         binding.btnServiceMessenger.setOnClickListener {
             startActivity(Intent(this, IpcDemoActivity::class.java))
         }
+    }
+
+    inline fun postBlock(block:() -> Unit){
+        block()
+    }
+
+    private fun test(){
+        postBlock {
+            return@test
+        }
+        runBlock {
+            return@runBlock
+        }
+    }
+
+    inline fun runBlock(crossinline block:()->Unit){
+        block()
     }
 }

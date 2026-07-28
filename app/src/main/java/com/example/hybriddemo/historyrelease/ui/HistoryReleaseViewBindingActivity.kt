@@ -1,11 +1,17 @@
 package com.example.hybriddemo.historyrelease.ui
 
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import com.example.hybriddemo.databinding.ActivityHistoryReleaseViewBindingBinding
 import com.example.hybriddemo.historyrelease.model.HistoryReleaseDemoUiState
+import com.example.hybriddemo.historyrelease.presentation.HistoryReleaseDemoEvent
 import com.example.hybriddemo.historyrelease.presentation.HistoryReleaseDemoViewModel
+import kotlinx.coroutines.launch
 
 class HistoryReleaseViewBindingActivity : AppCompatActivity() {
 
@@ -20,6 +26,7 @@ class HistoryReleaseViewBindingActivity : AppCompatActivity() {
         binding.topBar.subtitle.text = "所有渲染逻辑都在 Kotlin 中完成"
         bindActions()
         observeState()
+        observeEvents()
     }
 
     private fun bindActions() {
@@ -36,6 +43,24 @@ class HistoryReleaseViewBindingActivity : AppCompatActivity() {
     private fun observeState() {
         vm.uiState.observe(this, ::render)
         vm.actionLog.observe(this) { binding.tvActionLog.text = it }
+    }
+
+    private fun observeEvents() {
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                vm.events.collect { event ->
+                    when (event) {
+                        is HistoryReleaseDemoEvent.Toast -> {
+                            Toast.makeText(
+                                this@HistoryReleaseViewBindingActivity,
+                                event.message,
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
+                    }
+                }
+            }
+        }
     }
 
     private fun render(state: HistoryReleaseDemoUiState) = with(binding) {
