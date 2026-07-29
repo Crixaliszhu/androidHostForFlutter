@@ -3,13 +3,16 @@ package com.example.hybriddemo.historyrelease.presentation
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.hybriddemo.historyrelease.data.FakeHistoryReleaseDemoRepository
 import com.example.hybriddemo.historyrelease.data.HistoryReleaseDemoRepository
 import com.example.hybriddemo.historyrelease.domain.HistoryReleaseDemoStateFactory
 import com.example.hybriddemo.historyrelease.model.HistoryReleaseDemoUiState
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.launch
 import java.util.concurrent.Executors
 
 sealed interface HistoryReleaseDemoEvent {
@@ -36,6 +39,9 @@ class HistoryReleaseDemoViewModel(
     fun reload() {
         _uiState.value = HistoryReleaseDemoStateFactory.create(repository.loadHistoryRelease())
         _actionLog.value = "已加载历史招工数据"
+        viewModelScope.launch(Dispatchers.IO) {
+
+        }
     }
 
     fun onCopy() {

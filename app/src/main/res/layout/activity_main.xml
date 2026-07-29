@@ -117,6 +117,20 @@
             android:layout_marginTop="12dp"
             android:text="Memory Profiler 常见内存占用示例" />
 
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnOpenJobSearchCollapseDemo"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:text="搜索框上滑收起/下滑展开动画 Demo" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnOpenPathAnimationDemo"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:text="PathMeasure 路径动画 Demo" />
+
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

@@ -63,6 +63,8 @@
         <activity android:name=".storage.demo.StorageBestPracticeActivity" />
         <activity android:name=".performance.JankOnEnterActivity" />
         <activity android:name=".performance.MemoryLeakDemoActivity" />
+        <activity android:name=".customview.JobSearchCollapseDemoActivity" />
+        <activity android:name=".customview.PathAnimationDemoActivity" />
         <activity android:name="com.example.hybriddemo.ipc.ui.IpcDemoActivity" />
     </application>
 

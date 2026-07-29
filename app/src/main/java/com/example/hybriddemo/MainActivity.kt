@@ -8,6 +8,8 @@ import com.example.flutterbiz.api.IFlutterRouterService
 import com.example.flutterbiz.api.ServiceLocator
 import com.example.flutterbiz.bridge.EventApiCaller
 import com.example.hybriddemo.databinding.ActivityMainBinding
+import com.example.hybriddemo.customview.JobSearchCollapseDemoActivity
+import com.example.hybriddemo.customview.PathAnimationDemoActivity
 import com.example.hybriddemo.historyrelease.ui.HistoryReleaseComposeActivity
 import com.example.hybriddemo.historyrelease.ui.HistoryReleaseDataBindingActivity
 import com.example.hybriddemo.historyrelease.ui.HistoryReleaseViewBindingActivity
@@ -107,6 +109,14 @@ class MainActivity : AppCompatActivity() {
 
         binding.btnOpenMemoryLeakDemo.setOnClickListener {
             startActivity(Intent(this, MemoryLeakDemoActivity::class.java))
+        }
+
+        binding.btnOpenJobSearchCollapseDemo.setOnClickListener {
+            startActivity(Intent(this, JobSearchCollapseDemoActivity::class.java))
+        }
+
+        binding.btnOpenPathAnimationDemo.setOnClickListener {
+            startActivity(Intent(this, PathAnimationDemoActivity::class.java))
         }
     }
 
