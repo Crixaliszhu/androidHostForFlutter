@@ -2,6 +2,7 @@ package com.example.hybriddemo
 
 import android.os.Bundle
 import android.content.Intent
+import android.os.SystemClock
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.coroutineScope
 import com.example.flutterbiz.api.IFlutterRouterService
@@ -42,6 +43,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        reportColdStartupAfterFirstFrame()
 
         binding.btnOpenHome.setOnClickListener {
             // 主引擎打开首页：useMainEngine = true。
@@ -116,7 +118,15 @@ class MainActivity : AppCompatActivity() {
         }
 
         binding.btnOpenPathAnimationDemo.setOnClickListener {
-            startActivity(Intent(this, PathAnimationDemoActivity::class.java))
+//            startActivity(Intent(this, PathAnimationDemoActivity::class.java))
+            throw NullPointerException()
+        }
+    }
+
+    private fun reportColdStartupAfterFirstFrame() {
+        binding.root.post {
+            val costMillis = SystemClock.uptimeMillis() - DemoApplication.processStartUptimeMillis
+            GodEyeStartupReporter.reportColdStart(costMillis)
         }
     }
 

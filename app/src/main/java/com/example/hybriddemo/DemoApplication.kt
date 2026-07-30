@@ -1,6 +1,7 @@
 package com.example.hybriddemo
 
 import android.app.Application
+import android.os.SystemClock
 import com.example.flutterbiz.DemoFlutterInitManager
 import com.tencent.mmkv.MMKV
 
@@ -11,6 +12,10 @@ import com.tencent.mmkv.MMKV
  * 真实项目里的 `CustomApplication` 还做埋点、广告、IM 等初始化，这里精简掉。
  */
 class DemoApplication : Application() {
+    companion object {
+        val processStartUptimeMillis: Long = SystemClock.uptimeMillis()
+    }
+
     override fun onCreate() {
         super.onCreate()
         MMKV.initialize(this)

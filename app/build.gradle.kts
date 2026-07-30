@@ -29,6 +29,9 @@ android {
         getByName("debug") {
             isMinifyEnabled = false
             resValue("bool", "android_god_eye_manual_install", "false")
+            // GodEye 的 leakcanary 插件会手动安装 AppWatcher；关闭 LeakCanary 自带
+            // ContentProvider 自动安装，避免启动时出现 "AppWatcher already installed"。
+            resValue("bool", "leak_canary_watcher_auto_install", "false")
             // AndroidGodEye 3.x 的通知服务没有声明 foregroundServiceType，
             // targetSdk 34+ 设备上启动前台服务会崩溃；开发阶段直接关闭通知入口，
             // 仍可通过 adb forward + http://localhost:5390/index.html 查看 Web Monitor。
@@ -72,6 +75,27 @@ android {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
+    }
+}
+
+configurations.configureEach {
+    resolutionStrategy {
+        // AndroidGodEye 3.4.3 传递的是 LeakCanary 2.2：
+        // - Android 12+ 创建 PendingIntent 需要 FLAG_IMMUTABLE / FLAG_MUTABLE
+        // - Android 14+ 启动 ForegroundService 需要 foregroundServiceType
+        // 统一提升 LeakCanary/Shark 到新版 2.x，保留 GodEye 对分析结果的监听。
+        force(
+            "com.squareup.leakcanary:leakcanary-android:2.14",
+            "com.squareup.leakcanary:leakcanary-android-core:2.14",
+            "com.squareup.leakcanary:leakcanary-object-watcher:2.14",
+            "com.squareup.leakcanary:leakcanary-object-watcher-android:2.14",
+            "com.squareup.leakcanary:leakcanary-object-watcher-android-androidx:2.14",
+            "com.squareup.leakcanary:shark:2.14",
+            "com.squareup.leakcanary:shark-android:2.14",
+            "com.squareup.leakcanary:shark-graph:2.14",
+            "com.squareup.leakcanary:shark-hprof:2.14",
+            "com.squareup.leakcanary:shark-log:2.14",
+        )
     }
 }
 
