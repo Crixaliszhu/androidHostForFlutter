@@ -27,6 +27,11 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
+        // AndroidGodEye 3.x 发布在 JCenter；Bintray/JCenter 关闭后，国内镜像更稳定。
+        maven { setUrl("https://maven.aliyun.com/repository/jcenter") }
+        // AndroidGodEye 的部分历史依赖仍托管在 JCenter，仅在开发期 debug 包使用。
+        @Suppress("DEPRECATION")
+        jcenter()
         maven { setUrl("https://storage.googleapis.com/download.flutter.io") }
 
         // 1) Flutter Module 在 flutter_module/build/host/outputs/repo 下产出 Pigeon plugin AAR。

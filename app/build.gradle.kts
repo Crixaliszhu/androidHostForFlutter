@@ -28,9 +28,28 @@ android {
     buildTypes {
         getByName("debug") {
             isMinifyEnabled = false
+            resValue("bool", "android_god_eye_manual_install", "false")
+            // AndroidGodEye 3.x 的通知服务没有声明 foregroundServiceType，
+            // targetSdk 34+ 设备上启动前台服务会崩溃；开发阶段直接关闭通知入口，
+            // 仍可通过 adb forward + http://localhost:5390/index.html 查看 Web Monitor。
+            resValue("bool", "android_god_eye_need_notification", "false")
+            resValue("integer", "android_god_eye_monitor_port", "5390")
+            resValue(
+                "string",
+                "android_god_eye_install_assets_path",
+                "android-godeye-config/install.config"
+            )
         }
         getByName("release") {
             isMinifyEnabled = false
+            resValue("bool", "android_god_eye_manual_install", "true")
+            resValue("bool", "android_god_eye_need_notification", "false")
+            resValue("integer", "android_god_eye_monitor_port", "5390")
+            resValue(
+                "string",
+                "android_god_eye_install_assets_path",
+                "android-godeye-config/install.config"
+            )
         }
     }
 
@@ -79,6 +98,13 @@ dependencies {
     implementation("androidx.room:room-ktx:2.6.1")
     implementation("androidx.work:work-runtime-ktx:2.9.1")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
+
+    val androidGodEyeVersion = "3.4.3"
+    debugImplementation("cn.hikyson.godeye:godeye-core:$androidGodEyeVersion")
+    debugImplementation("cn.hikyson.godeye:godeye-monitor:$androidGodEyeVersion")
+    debugImplementation("cn.hikyson.godeye:godeye-xcrash:$androidGodEyeVersion")
+    debugImplementation("cn.hikyson.godeye:godeye-leakcanary:$androidGodEyeVersion")
+
     kapt("androidx.room:room-compiler:2.6.1")
     testImplementation("junit:junit:4.13.2")
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.8.1")

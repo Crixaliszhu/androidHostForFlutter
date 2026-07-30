@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <application>
+        <!--
+            AndroidGodEye 3.x 传递的旧 LeakCanary manifest 中，这个 launcher alias
+            带 intent-filter 但没有 android:exported。targetSdk 31+ 必须显式声明。
+        -->
+        <activity-alias
+            android:name="leakcanary.internal.activity.LeakLauncherActivity"
+            android:exported="false"
+            tools:replace="android:exported" />
+    </application>
+</manifest>
