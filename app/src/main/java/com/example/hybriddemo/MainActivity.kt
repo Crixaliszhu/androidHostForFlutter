@@ -44,6 +44,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        showAppVersion()
         reportColdStartupAfterFirstFrame()
 
         binding.btnOpenHome.setOnClickListener {
@@ -126,6 +127,12 @@ class MainActivity : AppCompatActivity() {
         binding.btnOpenSentryDemo.setOnClickListener {
             startActivity(Intent(this, SentryDemoActivity::class.java))
         }
+    }
+
+    private fun showAppVersion() {
+        // 首页底部展示的是当前安装包真实 BuildConfig 版本，便于测试时确认手机上安装的
+        // 是否就是刚打出来的 release/debug 包，也能和 Sentry release 信息互相核对。
+        binding.tvAppVersion.text = "版本 ${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})"
     }
 
     private fun reportColdStartupAfterFirstFrame() {

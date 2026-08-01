@@ -162,5 +162,16 @@
             android:text="提示：先点①打开首页，再回到这里点③，可以在首页看到 tick 计数 +1。"
             android:textColor="#666" />
 
+        <TextView
+            android:id="@+id/tvAppVersion"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:layout_marginBottom="16dp"
+            android:gravity="center"
+            android:padding="8dp"
+            android:textColor="#999999"
+            android:textSize="13sp" />
+
     </LinearLayout>
 </ScrollView>

@@ -1,4 +1,5 @@
 import java.util.Properties
+import com.android.build.gradle.internal.api.BaseVariantOutputImpl
 
 plugins {
     id("com.android.application")
@@ -28,6 +29,13 @@ val sentryAuthToken = sentryProperty("SENTRY_AUTH_TOKEN")
 val sentryOrg = sentryProperty("SENTRY_ORG").ifBlank { "crixalis" }
 val sentryProject = sentryProperty("SENTRY_PROJECT").ifBlank { "android" }
 
+// App 版本号集中在这里维护，避免 defaultConfig、APK 文件名、Sentry release 各写一份导致不一致。
+// SentryInitializer 会使用 BuildConfig.VERSION_NAME / VERSION_CODE 生成 release：
+// com.example.hybriddemo@1.0.2+261020。
+val appVersionName = "1.0.2"
+val appVersionCode = 261020
+val appArchiveBaseName = "AndroidHostForFlutter-v$appVersionName-$appVersionCode"
+
 // Release 签名同样优先从 local.properties 读取，CI 中可改用环境变量。
 // 密钥文件和密码都属于高敏感信息，只能保存在本机安全目录或 CI Secret，不能提交到仓库。
 fun releaseSigningProperty(name: String): String {
@@ -52,8 +60,8 @@ android {
         applicationId = "com.example.hybriddemo"
         minSdk = 24
         targetSdk = 35
-        versionCode = 261020
-        versionName = "1.0.2"
+        versionCode = appVersionCode
+        versionName = appVersionName
         // DSN 是 Sentry 项目的公开写入地址。这里通过 BuildConfig 暴露给运行时代码，
         // AndroidManifest 中已关闭 Sentry 自动初始化，避免 Provider 在 BuildConfig 可用前读取不到 DSN。
         buildConfigField("String", "SENTRY_DSN", "\"${sentryProperty("SENTRY_DSN")}\"")
@@ -172,6 +180,16 @@ android {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
+    }
+}
+
+// 让 assembleDebug / assembleRelease 生成的 APK 文件名携带版本号，方便测试包、正式包归档和回溯。
+// 示例：AndroidHostForFlutter-v1.0.2-261020-release.apk。
+// 注意：这里改的是 APK 输出名；如果后续使用 bundleRelease 生成 AAB，需要再单独配置 AAB 归档命名。
+android.applicationVariants.all {
+    outputs.all {
+        val variantName = name
+        (this as BaseVariantOutputImpl).outputFileName = "$appArchiveBaseName-$variantName.apk"
     }
 }
 
