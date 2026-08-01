@@ -1,6 +1,8 @@
 package com.example.hybriddemo.sentry
 
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.os.SystemClock
 import androidx.appcompat.app.AppCompatActivity
 import com.example.hybriddemo.BuildConfig
@@ -12,6 +14,11 @@ import io.sentry.SpanStatus
 
 class SentryDemoActivity : AppCompatActivity() {
     private lateinit var binding: ActivitySentryDemoBinding
+    private val mainHandler = Handler(Looper.getMainLooper())
+
+    // 忙等循环的结果写入字段，避免 R8/JIT 认为循环计算没有副作用而激进优化。
+    // Demo 的目的就是让主线程真实处于长时间执行状态，从而稳定触发 Sentry ANR watchdog。
+    private var anrBusyLoopGuard = 0.0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -47,9 +54,7 @@ class SentryDemoActivity : AppCompatActivity() {
         }
 
         binding.btnAnr.setOnClickListener {
-            Sentry.addBreadcrumb(Breadcrumb.info("Start ANR demo"))
-            SystemClock.sleep(8_000)
-            showResult("阻塞结束。如果 Sentry ANR watchdog 触发，后台会出现 ANR 事件。")
+            scheduleStableAnrDemo()
         }
 
         binding.btnCrash.setOnClickListener {
@@ -77,7 +82,46 @@ class SentryDemoActivity : AppCompatActivity() {
         }
     }
 
+    private fun scheduleStableAnrDemo() {
+        binding.btnAnr.isEnabled = false
+        Sentry.addBreadcrumb(
+            Breadcrumb.info("Schedule stable ANR demo").apply {
+                category = "demo.anr"
+                setData("block_duration_ms", STABLE_ANR_BLOCK_MS)
+            }
+        )
+        showResult("即将阻塞主线程 15 秒。建议使用 release 包、不连接调试器；阻塞期间可连续点击屏幕，让系统更容易判定输入超时 ANR。")
+
+        // 先把点击事件完整返回给主线程消息队列，让上面的提示文字有机会绘制到屏幕上。
+        // 如果直接在 onClick 里阻塞，用户看不到状态更新，也更像一次普通长点击卡顿而不是后续主线程失联。
+        mainHandler.postDelayed({
+            blockMainThreadForStableAnr(STABLE_ANR_BLOCK_MS)
+            binding.btnAnr.isEnabled = true
+            showResult("ANR Demo 阻塞结束。稍等片刻后到 Sentry Issues / Explore Errors 搜索 ANR 或 Application Not Responding。")
+        }, START_ANR_DELAY_MS)
+    }
+
+    private fun blockMainThreadForStableAnr(durationMs: Long) {
+        val startTime = SystemClock.elapsedRealtime()
+        var counter = 0L
+
+        // 使用忙等而不是 sleep：sleep 虽然也会阻塞 Looper，但忙等能在 Perfetto/Profile 中明显显示
+        // 主线程持续占用 CPU，更适合作为卡顿/ANR 分析示例。
+        while (SystemClock.elapsedRealtime() - startTime < durationMs) {
+            counter++
+            anrBusyLoopGuard += kotlin.math.sqrt(counter.toDouble())
+            if (counter % 100_000L == 0L) {
+                Thread.yield()
+            }
+        }
+    }
+
     private fun showResult(message: String) {
         binding.tvSentryResult.text = message
+    }
+
+    companion object {
+        private const val START_ANR_DELAY_MS = 300L
+        private const val STABLE_ANR_BLOCK_MS = 15_000L
     }
 }
