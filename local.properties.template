@@ -3,3 +3,20 @@
 sdk.dir=/Users/<you>/Library/Android/sdk
 # 同级 flutter_module 的绝对路径
 flutter.project.dir=/Users/<you>/AndroidStudioProjects/YuPaoProject/FlutterHybridDemo/flutter_module
+
+# Sentry 线上配置。真实值只放 local.properties 或 CI Secret，不提交到仓库。
+# DSN 是客户端上报地址，会被打进 APK；Auth Token 只用于构建期上传 mapping，不能进 APK。
+SENTRY_DSN=https://<public-key>@<org>.ingest.sentry.io/<project-id>
+SENTRY_ORG=crixalis
+SENTRY_PROJECT=android
+# 需要在 Sentry 后台创建 Organization Auth Token，至少具备 project:releases 相关权限。
+SENTRY_AUTH_TOKEN=sntrys_<token-with-project:releases-scope>
+
+# Release 构建默认采样率：Trace 5%，Profile 1%。
+# Trace 决定 Performance/Traces 样本量；Profile 决定 CPU 火焰图样本量。
+# 如果线上用户量大，建议先从更小值开始，例如 Trace 1%、Profile 0.2%。
+SENTRY_TRACES_SAMPLE_RATE=0.05
+SENTRY_PROFILES_SAMPLE_RATE=0.01
+# 截图和 ViewHierarchy 可能包含用户隐私，线上默认关闭。
+SENTRY_ATTACH_SCREENSHOT=false
+SENTRY_ATTACH_VIEW_HIERARCHY=false

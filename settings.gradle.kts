@@ -14,6 +14,12 @@ pluginManagement {
         // Flutter 引擎产物所在的官方镜像
         maven { setUrl("https://storage.googleapis.com/download.flutter.io") }
     }
+    plugins {
+        id("com.android.application") version "8.6.0"
+        id("com.android.library") version "8.6.0"
+        id("org.jetbrains.kotlin.android") version "1.9.22"
+        id("io.sentry.android.gradle") version "6.16.0"
+    }
 }
 
 dependencyResolutionManagement {

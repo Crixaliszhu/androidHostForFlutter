@@ -4,6 +4,7 @@ plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
     id("org.jetbrains.kotlin.kapt")
+    id("io.sentry.android.gradle")
 }
 
 val localProperties = Properties().apply {
@@ -13,11 +14,19 @@ val localProperties = Properties().apply {
     }
 }
 
+// Sentry 相关私密值优先从 local.properties 读取，CI 构建时也可以用环境变量覆盖。
+// 这样 DSN、Auth Token、采样率都不会被写死到仓库里，debug/release 也能复用同一套配置入口。
 fun sentryProperty(name: String): String {
     return localProperties.getProperty(name)
         ?: providers.environmentVariable(name).orNull
         ?: ""
 }
+
+// SENTRY_AUTH_TOKEN 只用于构建期上传 R8/ProGuard mapping.txt，不会被打进 APK。
+// 如果没有配置 token，正式包仍可构建，只是 Sentry 后台无法自动还原混淆后的崩溃栈。
+val sentryAuthToken = sentryProperty("SENTRY_AUTH_TOKEN")
+val sentryOrg = sentryProperty("SENTRY_ORG").ifBlank { "crixalis" }
+val sentryProject = sentryProperty("SENTRY_PROJECT").ifBlank { "android" }
 
 android {
     namespace = "com.example.hybriddemo"
@@ -27,11 +36,11 @@ android {
         applicationId = "com.example.hybriddemo"
         minSdk = 24
         targetSdk = 35
-        versionCode = 1
-        versionName = "1.0.0"
+        versionCode = 261010
+        versionName = "1.0.1"
+        // DSN 是 Sentry 项目的公开写入地址。这里通过 BuildConfig 暴露给运行时代码，
+        // AndroidManifest 中已关闭 Sentry 自动初始化，避免 Provider 在 BuildConfig 可用前读取不到 DSN。
         buildConfigField("String", "SENTRY_DSN", "\"${sentryProperty("SENTRY_DSN")}\"")
-        buildConfigField("String", "SENTRY_ENVIRONMENT", "\"debug-local\"")
-        buildConfigField("boolean", "SENTRY_DEBUG", "true")
         vectorDrawables {
             useSupportLibrary = true
         }
@@ -46,6 +55,17 @@ android {
     buildTypes {
         getByName("debug") {
             isMinifyEnabled = false
+            // 开发阶段使用独立环境，避免调试崩溃、手动卡顿、ANR Demo 污染线上指标。
+            buildConfigField("String", "SENTRY_ENVIRONMENT", "\"debug-local\"")
+            buildConfigField("boolean", "SENTRY_DEBUG", "true")
+            // Debug 全量采样，方便在 Sentry 的 Traces / Profiles 中立即看到每次点击和页面加载。
+            buildConfigField("double", "SENTRY_TRACES_SAMPLE_RATE", "1.0")
+            buildConfigField("double", "SENTRY_PROFILES_SAMPLE_RATE", "1.0")
+            // Debug 开启截图和 ViewHierarchy，便于学习事件现场；线上默认关闭，避免隐私和体积风险。
+            buildConfigField("boolean", "SENTRY_ATTACH_SCREENSHOT", "true")
+            buildConfigField("boolean", "SENTRY_ATTACH_VIEW_HIERARCHY", "true")
+            // Sentry 默认不在 debug 构建中上报 ANR，这里为了 Demo 明确打开。
+            buildConfigField("boolean", "SENTRY_REPORT_ANR_IN_DEBUG", "true")
             resValue("bool", "android_god_eye_manual_install", "false")
             // GodEye 的 leakcanary 插件会手动安装 AppWatcher；关闭 LeakCanary 自带
             // ContentProvider 自动安装，避免启动时出现 "AppWatcher already installed"。
@@ -62,7 +82,25 @@ android {
             )
         }
         getByName("release") {
-            isMinifyEnabled = false
+            // 正式包开启 R8 混淆和资源压缩，用于接近线上真实体积、堆栈和性能表现。
+            // mapping.txt 会由 Sentry Gradle Plugin 在构建后上传，用于后台还原混淆栈。
+            isMinifyEnabled = true
+            isShrinkResources = true
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
+            // 线上统一使用 production，Sentry 后台的 Issues、Releases、Alerts 都按这个环境筛选。
+            buildConfigField("String", "SENTRY_ENVIRONMENT", "\"production\"")
+            buildConfigField("boolean", "SENTRY_DEBUG", "false")
+            // Trace 采样率控制 Performance/Traces 数据量；默认 5%，可在 local.properties 或 CI 中调整。
+            buildConfigField("double", "SENTRY_TRACES_SAMPLE_RATE", sentryProperty("SENTRY_TRACES_SAMPLE_RATE").ifBlank { "0.05" })
+            // Profile 采样率是在已采样 Trace 的基础上继续抽样；默认 1%，避免线上 CPU profiling 成本过高。
+            buildConfigField("double", "SENTRY_PROFILES_SAMPLE_RATE", sentryProperty("SENTRY_PROFILES_SAMPLE_RATE").ifBlank { "0.01" })
+            // 线上默认不附带截图和 ViewHierarchy。若业务明确允许，再通过构建参数小流量开启。
+            buildConfigField("boolean", "SENTRY_ATTACH_SCREENSHOT", sentryProperty("SENTRY_ATTACH_SCREENSHOT").ifBlank { "false" })
+            buildConfigField("boolean", "SENTRY_ATTACH_VIEW_HIERARCHY", sentryProperty("SENTRY_ATTACH_VIEW_HIERARCHY").ifBlank { "false" })
+            buildConfigField("boolean", "SENTRY_REPORT_ANR_IN_DEBUG", "false")
             resValue("bool", "android_god_eye_manual_install", "true")
             resValue("bool", "android_god_eye_need_notification", "false")
             resValue("integer", "android_god_eye_monitor_port", "5390")
@@ -95,6 +133,27 @@ android {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
     }
+}
+
+sentry {
+    // 这三个值决定 mapping.txt 上传到哪个 Sentry 组织和项目。
+    // 本 Demo 对应 https://crixalis.sentry.io/projects/android/。
+    org.set(sentryOrg)
+    projectName.set(sentryProject)
+    authToken.set(sentryAuthToken)
+
+    // includeProguardMapping 负责把 R8 mapping 作为构建产物交给 Sentry 插件；
+    // autoUploadProguardMapping 只有在配置 token 时才上传，避免本地无 token 构建失败。
+    includeProguardMapping.set(true)
+    autoUploadProguardMapping.set(sentryAuthToken.isNotBlank())
+    // Source Context 会上传源码片段，线上通常关闭，避免源码或敏感业务逻辑暴露到第三方平台。
+    includeSourceContext.set(false)
+    // 关闭构建插件遥测，不影响 Sentry 崩溃、ANR、性能数据上报。
+    telemetry.set(false)
+
+    // 当前 Demo 没有接入 native so 符号表上传；后续如引入 NDK/Flutter native symbols 再单独开启。
+    uploadNativeSymbols.set(false)
+    includeNativeSources.set(false)
 }
 
 configurations.configureEach {
