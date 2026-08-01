@@ -52,8 +52,8 @@ android {
         applicationId = "com.example.hybriddemo"
         minSdk = 24
         targetSdk = 35
-        versionCode = 261010
-        versionName = "1.0.1"
+        versionCode = 261020
+        versionName = "1.0.2"
         // DSN 是 Sentry 项目的公开写入地址。这里通过 BuildConfig 暴露给运行时代码，
         // AndroidManifest 中已关闭 Sentry 自动初始化，避免 Provider 在 BuildConfig 可用前读取不到 DSN。
         buildConfigField("String", "SENTRY_DSN", "\"${sentryProperty("SENTRY_DSN")}\"")
