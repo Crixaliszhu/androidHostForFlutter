@@ -20,3 +20,10 @@ SENTRY_PROFILES_SAMPLE_RATE=0.01
 # 截图和 ViewHierarchy 可能包含用户隐私，线上默认关闭。
 SENTRY_ATTACH_SCREENSHOT=false
 SENTRY_ATTACH_VIEW_HIERARCHY=false
+
+# Release 签名配置。keystore 和密码不能提交 Git，线上 CI 应放到 Secret。
+# RELEASE_STORE_FILE 可以是绝对路径，也可以是相对项目根目录的路径。
+RELEASE_STORE_FILE=/Users/<you>/secure/androidHostForFlutter-release.jks
+RELEASE_STORE_PASSWORD=<store-password>
+RELEASE_KEY_ALIAS=androidHostForFlutter
+RELEASE_KEY_PASSWORD=<key-password>

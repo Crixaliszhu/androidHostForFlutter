@@ -28,6 +28,22 @@ val sentryAuthToken = sentryProperty("SENTRY_AUTH_TOKEN")
 val sentryOrg = sentryProperty("SENTRY_ORG").ifBlank { "crixalis" }
 val sentryProject = sentryProperty("SENTRY_PROJECT").ifBlank { "android" }
 
+// Release 签名同样优先从 local.properties 读取，CI 中可改用环境变量。
+// 密钥文件和密码都属于高敏感信息，只能保存在本机安全目录或 CI Secret，不能提交到仓库。
+fun releaseSigningProperty(name: String): String {
+    return localProperties.getProperty(name)
+        ?: providers.environmentVariable(name).orNull
+        ?: ""
+}
+
+val releaseStoreFilePath = releaseSigningProperty("RELEASE_STORE_FILE")
+val hasReleaseSigningConfig = listOf(
+    releaseStoreFilePath,
+    releaseSigningProperty("RELEASE_STORE_PASSWORD"),
+    releaseSigningProperty("RELEASE_KEY_ALIAS"),
+    releaseSigningProperty("RELEASE_KEY_PASSWORD"),
+).all { it.isNotBlank() }
+
 android {
     namespace = "com.example.hybriddemo"
     compileSdk = 35
@@ -109,6 +125,30 @@ android {
                 "android_god_eye_install_assets_path",
                 "android-godeye-config/install.config"
             )
+        }
+    }
+
+    signingConfigs {
+        create("release") {
+            // storeFile 支持绝对路径，也支持相对项目根目录的路径。
+            // 推荐使用绝对路径或放在项目外部目录，降低误提交 keystore 的风险。
+            if (releaseStoreFilePath.isNotBlank()) {
+                storeFile = file(releaseStoreFilePath)
+            }
+            storePassword = releaseSigningProperty("RELEASE_STORE_PASSWORD")
+            keyAlias = releaseSigningProperty("RELEASE_KEY_ALIAS")
+            keyPassword = releaseSigningProperty("RELEASE_KEY_PASSWORD")
+        }
+    }
+
+    buildTypes {
+        getByName("release") {
+            // 只有四个签名参数都存在时才绑定 release 签名。
+            // 这样没有 keystore 的新环境仍可执行 assembleRelease 验证 R8/mapping 产物，
+            // 但真正安装或分发线上包前，必须补齐 local.properties/CI Secret。
+            if (hasReleaseSigningConfig) {
+                signingConfig = signingConfigs.getByName("release")
+            }
         }
     }
 
