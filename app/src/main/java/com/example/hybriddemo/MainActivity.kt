@@ -18,6 +18,7 @@ import com.example.hybriddemo.ipc.ui.IpcDemoActivity
 import com.example.hybriddemo.mediastore.PhotoPickerDemoActivity
 import com.example.hybriddemo.performance.JankOnEnterActivity
 import com.example.hybriddemo.performance.MemoryLeakDemoActivity
+import com.example.hybriddemo.sentry.SentryDemoActivity
 import com.example.hybriddemo.service.page.ServiceDemoActivity
 import com.example.hybriddemo.service.workmanager.WorkManagerDemoActivity
 import com.example.hybriddemo.storage.demo.StorageBestPracticeActivity
@@ -120,6 +121,10 @@ class MainActivity : AppCompatActivity() {
         binding.btnOpenPathAnimationDemo.setOnClickListener {
 //            startActivity(Intent(this, PathAnimationDemoActivity::class.java))
             throw NullPointerException()
+        }
+
+        binding.btnOpenSentryDemo.setOnClickListener {
+            startActivity(Intent(this, SentryDemoActivity::class.java))
         }
     }
 

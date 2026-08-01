@@ -1,7 +1,22 @@
+import java.util.Properties
+
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
     id("org.jetbrains.kotlin.kapt")
+}
+
+val localProperties = Properties().apply {
+    val file = rootProject.file("local.properties")
+    if (file.exists()) {
+        file.inputStream().use { load(it) }
+    }
+}
+
+fun sentryProperty(name: String): String {
+    return localProperties.getProperty(name)
+        ?: providers.environmentVariable(name).orNull
+        ?: ""
 }
 
 android {
@@ -14,6 +29,9 @@ android {
         targetSdk = 35
         versionCode = 1
         versionName = "1.0.0"
+        buildConfigField("String", "SENTRY_DSN", "\"${sentryProperty("SENTRY_DSN")}\"")
+        buildConfigField("String", "SENTRY_ENVIRONMENT", "\"debug-local\"")
+        buildConfigField("boolean", "SENTRY_DEBUG", "true")
         vectorDrawables {
             useSupportLibrary = true
         }
@@ -66,6 +84,7 @@ android {
         viewBinding = true
         dataBinding = true
         compose = true
+        buildConfig = true
     }
 
     composeOptions {
@@ -121,6 +140,7 @@ dependencies {
     implementation("androidx.room:room-runtime:2.6.1")
     implementation("androidx.room:room-ktx:2.6.1")
     implementation("androidx.work:work-runtime-ktx:2.9.1")
+    implementation("io.sentry:sentry-android:8.51.0")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
 
     val androidGodEyeVersion = "3.4.3"

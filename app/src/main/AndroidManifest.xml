@@ -18,6 +18,15 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/Theme.HybridDemo">
+        <!--
+            Sentry SDK 默认会通过 SentryInitProvider 自动初始化，并要求 Manifest 中存在 DSN。
+            本 Demo 使用 local.properties / 环境变量注入 DSN 并在 DemoApplication 中手动初始化，
+            所以关闭自动初始化，避免未配置 DSN 的开发机启动崩溃。
+        -->
+        <meta-data
+            android:name="io.sentry.auto-init"
+            android:value="false" />
+
         <service
             android:name=".service.bind_ervice.SyncDemoService"
             android:exported="false" />
@@ -64,6 +73,7 @@
         <activity android:name=".storage.demo.StorageBestPracticeActivity" />
         <activity android:name=".performance.JankOnEnterActivity" />
         <activity android:name=".performance.MemoryLeakDemoActivity" />
+        <activity android:name=".sentry.SentryDemoActivity" />
         <activity android:name=".customview.JobSearchCollapseDemoActivity" />
         <activity android:name=".customview.PathAnimationDemoActivity" />
         <activity android:name="com.example.hybriddemo.ipc.ui.IpcDemoActivity" />

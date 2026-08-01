@@ -3,6 +3,7 @@ package com.example.hybriddemo
 import android.app.Application
 import android.os.SystemClock
 import com.example.flutterbiz.DemoFlutterInitManager
+import com.example.hybriddemo.sentry.SentryInitializer
 import com.tencent.mmkv.MMKV
 
 /**
@@ -18,6 +19,7 @@ class DemoApplication : Application() {
 
     override fun onCreate() {
         super.onCreate()
+        SentryInitializer.init(this)
         MMKV.initialize(this)
         // 触发：
         //  - FlutterEngineManager.init(...)
