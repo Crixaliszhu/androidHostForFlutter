@@ -126,10 +126,10 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="12dp"
-                    android:orientation="horizontal"
-                    android:showDividers="middle"
+                    android:divider="@android:color/transparent"
                     android:dividerPadding="6dp"
-                    android:divider="@android:color/transparent">
+                    android:orientation="horizontal"
+                    android:showDividers="middle">
 
                     <com.google.android.material.button.MaterialButton
                         style="@style/Widget.Material3.Button"
@@ -154,10 +154,10 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="12dp"
-                    android:orientation="horizontal"
-                    android:showDividers="middle"
+                    android:divider="@android:color/transparent"
                     android:dividerPadding="6dp"
-                    android:divider="@android:color/transparent">
+                    android:orientation="horizontal"
+                    android:showDividers="middle">
 
                     <com.google.android.material.button.MaterialButton
                         style="@style/Widget.Material3.Button.OutlinedButton"
@@ -182,10 +182,10 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="12dp"
-                    android:orientation="horizontal"
-                    android:showDividers="middle"
+                    android:divider="@android:color/transparent"
                     android:dividerPadding="6dp"
-                    android:divider="@android:color/transparent">
+                    android:orientation="horizontal"
+                    android:showDividers="middle">
 
                     <com.google.android.material.button.MaterialButton
                         style="@style/Widget.Material3.Button"
@@ -239,6 +239,49 @@
                     android:layout_marginTop="8dp"
                     android:text="@{vm.actionLog}"
                     android:textColor="#555555" />
+
+                <LinearLayout
+                    android:id="@+id/llayout1"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        android:text="@{vm.secondUiState1.title}"
+                        android:textColor="#555555" />
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        android:text="@{vm.secondUiState1.subTitle}"
+                        android:textColor="#555555" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/llayout2"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        android:text="@{vm.us.title}"
+                        android:textColor="#555555" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        android:text="@{vm.us.subTitle}"
+                        android:textColor="#555555" />
+                </LinearLayout>
             </LinearLayout>
         </LinearLayout>
     </ScrollView>

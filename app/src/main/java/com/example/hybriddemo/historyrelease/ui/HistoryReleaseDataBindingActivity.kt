@@ -46,5 +46,6 @@ class HistoryReleaseDataBindingActivity : AppCompatActivity() {
                 }
             }
         }
+        vm.secondFetch()
     }
 }

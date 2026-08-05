@@ -11,4 +11,5 @@ class HistoryReleaseDemoActionProxy(
     fun onModifyTop() = vm.onModifyTop()
     fun onRedo() = vm.onRedo()
     fun onManageRecruit() = vm.onManageRecruit()
+    fun sendSecond() = vm.secondFetch()
 }

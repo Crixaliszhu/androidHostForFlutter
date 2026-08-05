@@ -1,5 +1,7 @@
 package com.example.hybriddemo.historyrelease.model
 
+import androidx.annotation.Keep
+
 enum class HistoryReleaseDemoUiType {
     Full,
     TopAndNotFull,
@@ -15,6 +17,12 @@ data class HistoryReleaseDemoItem(
     val topEndTime: String?,
     val workerCountText: String,
     val uiType: HistoryReleaseDemoUiType,
+)
+
+data class HistoryReleaseSecondItem(
+    val jobId: String,
+    val title: String,
+    val subTitle: String
 )
 
 data class HistoryReleaseDemoUiState(
@@ -33,4 +41,10 @@ data class HistoryReleaseDemoUiState(
     val showModify: Boolean,
     val showRedo: Boolean,
     val showManageRecruit: Boolean,
+)
+
+@Keep
+data class HistorySecondUiState(
+    val title:String,
+    val subTitle:String,
 )

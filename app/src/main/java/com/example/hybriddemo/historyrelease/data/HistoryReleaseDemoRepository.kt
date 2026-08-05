@@ -2,9 +2,16 @@ package com.example.hybriddemo.historyrelease.data
 
 import com.example.hybriddemo.historyrelease.model.HistoryReleaseDemoItem
 import com.example.hybriddemo.historyrelease.model.HistoryReleaseDemoUiType
+import com.example.hybriddemo.historyrelease.model.HistoryReleaseSecondItem
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOn
 
 interface HistoryReleaseDemoRepository {
     fun loadHistoryRelease(): HistoryReleaseDemoItem
+
+    fun loadSecondHistory(index: Int): Flow<HistoryReleaseSecondItem>
 }
 
 class FakeHistoryReleaseDemoRepository : HistoryReleaseDemoRepository {
@@ -19,5 +26,18 @@ class FakeHistoryReleaseDemoRepository : HistoryReleaseDemoRepository {
             workerCountText = "已招 7/10 人",
             uiType = HistoryReleaseDemoUiType.TopAndNotFull,
         )
+    }
+
+    override fun loadSecondHistory(index: Int): Flow<HistoryReleaseSecondItem> {
+        return flow {
+            println("HistoryReleaseDemoViewModel-loadSecondHistory ${index}")
+            emit(
+                HistoryReleaseSecondItem(
+                    jobId = "1111-${index}",
+                    title = "second-title-${index}",
+                    subTitle = "second-sub title-${index}",
+                )
+            )
+        }.flowOn(Dispatchers.IO)
     }
 }
