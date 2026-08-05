@@ -69,6 +69,13 @@
             android:text="⑥ Compose 版本" />
 
         <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnOpenFlowCompose"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:text="ViewModel + Flow + Compose 示例" />
+
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/btnXbusMain"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

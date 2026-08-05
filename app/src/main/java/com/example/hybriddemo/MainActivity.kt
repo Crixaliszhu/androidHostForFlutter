@@ -4,13 +4,17 @@ import android.os.Bundle
 import android.content.Intent
 import android.os.SystemClock
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.coroutineScope
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import com.example.flutterbiz.api.IFlutterRouterService
 import com.example.flutterbiz.api.ServiceLocator
 import com.example.flutterbiz.bridge.EventApiCaller
 import com.example.hybriddemo.databinding.ActivityMainBinding
 import com.example.hybriddemo.customview.JobSearchCollapseDemoActivity
 import com.example.hybriddemo.customview.PathAnimationDemoActivity
+import com.example.hybriddemo.flowcompose.FlowComposeActivity
 import com.example.hybriddemo.historyrelease.ui.HistoryReleaseComposeActivity
 import com.example.hybriddemo.historyrelease.ui.HistoryReleaseDataBindingActivity
 import com.example.hybriddemo.historyrelease.ui.HistoryReleaseViewBindingActivity
@@ -83,6 +87,10 @@ class MainActivity : AppCompatActivity() {
             startActivity(Intent(this, HistoryReleaseComposeActivity::class.java))
         }
 
+        binding.btnOpenFlowCompose.setOnClickListener {
+            startActivity(Intent(this, FlowComposeActivity::class.java))
+        }
+
         binding.btnOpenStorageBestPractice.setOnClickListener {
             startActivity(Intent(this, StorageBestPracticeActivity::class.java))
         }
@@ -126,6 +134,10 @@ class MainActivity : AppCompatActivity() {
 
         binding.btnOpenSentryDemo.setOnClickListener {
             startActivity(Intent(this, SentryDemoActivity::class.java))
+        }
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.CREATED){
+            }
         }
     }
 
