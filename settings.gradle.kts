@@ -50,6 +50,7 @@ dependencyResolutionManagement {
 rootProject.name = "FlutterHybridDemo"
 
 include(":app")
+include(":anr_monitor")
 include(":flutter_engine")
 include(":flutter_biz")
 

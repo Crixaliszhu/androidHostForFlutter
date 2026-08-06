@@ -2,6 +2,8 @@ package com.example.hybriddemo
 
 import android.app.Application
 import android.os.SystemClock
+import com.example.anrmonitor.SelfAnrConfig
+import com.example.anrmonitor.SelfAnrInitializer
 import com.example.flutterbiz.DemoFlutterInitManager
 import com.example.hybriddemo.sentry.SentryInitializer
 import com.tencent.mmkv.MMKV
@@ -20,6 +22,13 @@ class DemoApplication : Application() {
     override fun onCreate() {
         super.onCreate()
         SentryInitializer.init(this)
+        SelfAnrInitializer.init(
+            application = this,
+            config = SelfAnrConfig(
+                enabled = BuildConfig.SELF_ANR_ENABLED,
+                reportUrl = BuildConfig.SELF_ANR_REPORT_URL,
+            ),
+        )
         MMKV.initialize(this)
         // 触发：
         //  - FlutterEngineManager.init(...)
