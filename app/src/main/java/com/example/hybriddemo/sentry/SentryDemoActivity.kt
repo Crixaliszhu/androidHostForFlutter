@@ -30,7 +30,8 @@ class SentryDemoActivity : AppCompatActivity() {
             appendLine("DSN configured: ${BuildConfig.SENTRY_DSN.isNotBlank()}")
             appendLine("Environment: ${BuildConfig.SENTRY_ENVIRONMENT}")
         }
-        binding.tvSentryResult.text = "没有 DSN 时不会发到 Sentry 后台；配置 DSN 后点击按钮即可在 Issues / Performance / Profiling / ANR 中查看。"
+        binding.tvSentryResult.text =
+            "没有 DSN 时不会发到 Sentry 后台；配置 DSN 后点击按钮即可在 Issues / Performance / Profiling / ANR 中查看。"
 
         binding.btnCaptureMessage.setOnClickListener {
             Sentry.captureMessage("AndroidHostForFlutter Sentry message demo", SentryLevel.INFO)
@@ -99,6 +100,15 @@ class SentryDemoActivity : AppCompatActivity() {
             binding.btnAnr.isEnabled = true
             showResult("ANR Demo 阻塞结束。稍等片刻后到 Sentry Issues / Explore Errors 搜索 ANR 或 Application Not Responding。")
         }, START_ANR_DELAY_MS)
+    }
+
+    private fun anrTest() {
+        var i = 0
+        while (i < 1_000_000_000) {
+            i++
+            SystemClock.sleep(100)
+            println("打印次数 =>>> ${i}")
+        }
     }
 
     private fun blockMainThreadForStableAnr(durationMs: Long) {

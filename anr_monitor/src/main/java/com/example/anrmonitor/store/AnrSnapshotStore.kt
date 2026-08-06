@@ -1,6 +1,8 @@
-package com.example.anrmonitor
+package com.example.anrmonitor.store
 
 import android.content.Context
+import com.example.anrmonitor.config.SelfAnrConfig
+import com.example.anrmonitor.entity.AnrEvent
 import java.io.File
 
 /**

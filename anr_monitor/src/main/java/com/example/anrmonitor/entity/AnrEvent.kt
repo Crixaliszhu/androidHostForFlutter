@@ -1,4 +1,4 @@
-package com.example.anrmonitor
+package com.example.anrmonitor.entity
 
 import org.json.JSONArray
 import org.json.JSONObject

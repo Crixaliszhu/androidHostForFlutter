@@ -2,7 +2,7 @@ package com.example.hybriddemo
 
 import android.app.Application
 import android.os.SystemClock
-import com.example.anrmonitor.SelfAnrConfig
+import com.example.anrmonitor.config.SelfAnrConfig
 import com.example.anrmonitor.SelfAnrInitializer
 import com.example.flutterbiz.DemoFlutterInitManager
 import com.example.hybriddemo.sentry.SentryInitializer

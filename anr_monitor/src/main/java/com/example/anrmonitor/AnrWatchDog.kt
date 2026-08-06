@@ -2,6 +2,10 @@ package com.example.anrmonitor
 
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
+import com.example.anrmonitor.config.SelfAnrConfig
+import com.example.anrmonitor.entity.AnrEvent
+import com.example.anrmonitor.util.AnrThreadDumper
 import java.util.UUID
 import java.util.concurrent.atomic.AtomicLong
 
@@ -21,6 +25,7 @@ class AnrWatchDog(
     override fun run() {
         while (!isInterrupted) {
             val lastTick = tick.get()
+            // 每 watchDogTimeoutMillis 投递一次任务，在runnable里tick+1
             mainHandler.post {
                 tick.incrementAndGet()
                 reportedInCurrentFreeze = false
@@ -32,7 +37,7 @@ class AnrWatchDog(
                 interrupt()
                 return
             }
-
+            // watchDogTimeoutMillis 后tick没有+1则说明主线程handler被耗时操作占用；
             if (tick.get() == lastTick && !reportedInCurrentFreeze) {
                 // 同一次卡死可能持续多个检测周期，每个卡死窗口只保留一条事件。
                 reportedInCurrentFreeze = true
@@ -42,6 +47,7 @@ class AnrWatchDog(
     }
 
     private fun buildWatchDogEvent(): AnrEvent {
+        Log.e("watchdog", "检测到 ANR")
         return AnrEvent(
             id = UUID.randomUUID().toString(),
             type = "watchdog",

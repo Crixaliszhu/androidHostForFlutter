@@ -2,6 +2,9 @@ package com.example.anrmonitor
 
 import android.app.Application
 import android.os.Build
+import com.example.anrmonitor.config.SelfAnrConfig
+import com.example.anrmonitor.reporter.AnrHttpReporter
+import com.example.anrmonitor.store.AnrSnapshotStore
 import java.util.concurrent.Executors
 
 /**
@@ -17,13 +20,16 @@ object SelfAnrInitializer {
 
     private var watchDog: AnrWatchDog? = null
 
+    private val breadcrumbs by lazy(LazyThreadSafetyMode.NONE) {
+        AnrBreadcrumbs()
+    }
+
     /**
      * 按进程初始化一次 ANR 监控。
      */
     fun init(application: Application, config: SelfAnrConfig) {
         if (!config.enabled || watchDog != null) return
 
-        val breadcrumbs = AnrBreadcrumbs()
         application.registerActivityLifecycleCallbacks(breadcrumbs)
 
         val store = AnrSnapshotStore(application, config)
@@ -32,7 +38,12 @@ object SelfAnrInitializer {
 
         executor.execute {
             // 系统确认的 ANR 只能在进程重启后读取，所以初始化时优先补报。
-            AppExitAnrCollector(application, config, breadcrumbs, processNameProvider).collect { event ->
+            AppExitAnrCollector(
+                application,
+                config,
+                breadcrumbs,
+                processNameProvider
+            ).collect { event ->
                 store.enqueue(event)
             }
             uploadPending(store, reporter)

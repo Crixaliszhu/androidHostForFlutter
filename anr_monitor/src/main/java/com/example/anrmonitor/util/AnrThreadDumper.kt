@@ -1,4 +1,4 @@
-package com.example.anrmonitor
+package com.example.anrmonitor.util
 
 import android.os.Looper
 

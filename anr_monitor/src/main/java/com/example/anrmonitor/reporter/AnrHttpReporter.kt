@@ -1,5 +1,6 @@
-package com.example.anrmonitor
+package com.example.anrmonitor.reporter
 
+import com.example.anrmonitor.config.SelfAnrConfig
 import java.io.File
 import java.net.HttpURLConnection
 import java.net.URL

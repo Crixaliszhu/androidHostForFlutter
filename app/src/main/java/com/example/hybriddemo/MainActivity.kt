@@ -128,8 +128,8 @@ class MainActivity : AppCompatActivity() {
         }
 
         binding.btnOpenPathAnimationDemo.setOnClickListener {
-//            startActivity(Intent(this, PathAnimationDemoActivity::class.java))
-            throw NullPointerException()
+            startActivity(Intent(this, PathAnimationDemoActivity::class.java))
+//            throw NullPointerException()
         }
 
         binding.btnOpenSentryDemo.setOnClickListener {
