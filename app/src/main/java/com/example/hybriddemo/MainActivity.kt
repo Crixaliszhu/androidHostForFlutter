@@ -12,6 +12,7 @@ import com.example.flutterbiz.api.IFlutterRouterService
 import com.example.flutterbiz.api.ServiceLocator
 import com.example.flutterbiz.bridge.EventApiCaller
 import com.example.hybriddemo.databinding.ActivityMainBinding
+import com.example.hybriddemo.anrdemo.AnrCasesDemoActivity
 import com.example.hybriddemo.customview.JobSearchCollapseDemoActivity
 import com.example.hybriddemo.customview.PathAnimationDemoActivity
 import com.example.hybriddemo.flowcompose.FlowComposeActivity
@@ -134,6 +135,10 @@ class MainActivity : AppCompatActivity() {
 
         binding.btnOpenSentryDemo.setOnClickListener {
             startActivity(Intent(this, SentryDemoActivity::class.java))
+        }
+
+        binding.btnOpenAnrCasesDemo.setOnClickListener {
+            startActivity(Intent(this, AnrCasesDemoActivity::class.java))
         }
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.CREATED){

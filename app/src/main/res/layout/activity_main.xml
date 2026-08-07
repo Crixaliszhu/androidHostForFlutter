@@ -145,6 +145,13 @@
             android:layout_marginTop="12dp"
             android:text="Sentry 卡顿 / ANR / 崩溃分析 Demo" />
 
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnOpenAnrCasesDemo"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:text="ANR 八类场景演示 Demo" />
+
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

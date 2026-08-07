@@ -6,7 +6,6 @@ import android.app.ApplicationExitInfo
 import android.content.Context
 import android.os.Build
 import android.util.Log
-import androidx.annotation.RequiresApi
 import com.example.anrmonitor.config.SelfAnrConfig
 import com.example.anrmonitor.entity.AnrEvent
 import java.util.UUID
@@ -37,7 +36,6 @@ class AppExitAnrCollector(
             }
     }
 
-    @RequiresApi(Build.VERSION_CODES.R)
     private fun ApplicationExitInfo.toAnrEvent(): AnrEvent {
         Log.e("watchdog", "上传 系统ANR日志：system_exit_info")
         return AnrEvent(
@@ -59,7 +57,6 @@ class AppExitAnrCollector(
         )
     }
 
-    @RequiresApi(Build.VERSION_CODES.R)
     private fun ApplicationExitInfo.readTrace(): String? {
         return traceInputStream?.bufferedReader()?.use { reader ->
             val buffer = CharArray(config.maxTraceChars)
@@ -68,7 +65,6 @@ class AppExitAnrCollector(
         }
     }
 
-    @RequiresApi(Build.VERSION_CODES.R)
     private fun ApplicationExitInfo.dedupeKey(): String {
         return "${pid}_${timestamp}_${reason}"
     }

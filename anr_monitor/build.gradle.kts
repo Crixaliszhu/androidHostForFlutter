@@ -17,6 +17,3 @@ android {
     }
     kotlinOptions { jvmTarget = "17" }
 }
-dependencies {
-    implementation("androidx.annotation:annotation-jvm:1.10.0")
-}

@@ -38,6 +38,19 @@
             android:name="com.example.hybriddemo.ipc.service.MessengerLongService"
             android:process=":ffmpge"
             android:exported="false"/>
+        <service
+            android:name=".anrdemo.AnrDemoService"
+            android:exported="false" />
+
+        <receiver
+            android:name=".anrdemo.AnrDemoReceiver"
+            android:exported="false" />
+
+        <provider
+            android:name=".anrdemo.AnrDemoProvider"
+            android:authorities="${applicationId}.anr.provider"
+            android:exported="false"
+            android:process=":anr_provider" />
 
         <activity
             android:name=".mediastore.PhotoPickerDemoActivity"
@@ -75,6 +88,7 @@
         <activity android:name=".performance.JankOnEnterActivity" />
         <activity android:name=".performance.MemoryLeakDemoActivity" />
         <activity android:name=".sentry.SentryDemoActivity" />
+        <activity android:name=".anrdemo.AnrCasesDemoActivity" />
         <activity android:name=".customview.JobSearchCollapseDemoActivity" />
         <activity android:name=".customview.PathAnimationDemoActivity" />
         <activity android:name="com.example.hybriddemo.ipc.ui.IpcDemoActivity" />

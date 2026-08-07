@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="8dp"
+            android:text="ANR 类型演示"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/tvAnrStatus"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:padding="8dp"
+            android:text="建议使用 release 包、不连接调试器；点击任一按钮后等待系统 trace 或自研 ANR 日志。"
+            android:textColor="#666666" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnMainCpuAnr"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:text="1. 主线程耗时：CPU 忙等" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnMainIoAnr"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:text="2. 主线程 IO：文件写入 + fsync" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnIpcAnr"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:text="3. 同步 Binder / IPC：远程 Provider" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnLockAnr"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:text="4. 锁等待：主线程等待子线程持锁" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnBroadcastAnr"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:text="5. BroadcastReceiver 超时" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnServiceAnr"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:text="6. Service 生命周期超时" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnProviderAnr"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:text="7. ContentProvider 查询超时" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnInputAnr"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:text="8. 输入事件超时：阻塞后继续点击屏幕" />
+
+    </LinearLayout>
+</ScrollView>
