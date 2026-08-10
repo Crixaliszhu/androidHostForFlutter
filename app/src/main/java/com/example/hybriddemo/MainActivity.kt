@@ -26,6 +26,7 @@ import com.example.hybriddemo.performance.MemoryLeakDemoActivity
 import com.example.hybriddemo.sentry.SentryDemoActivity
 import com.example.hybriddemo.service.page.ServiceDemoActivity
 import com.example.hybriddemo.service.workmanager.WorkManagerDemoActivity
+import com.example.hybriddemo.settings.SettingsActivity
 import com.example.hybriddemo.storage.demo.StorageBestPracticeActivity
 import com.example.hybriddemo.xbus.XBusMainActivity
 import kotlinx.coroutines.NonCancellable
@@ -139,6 +140,10 @@ class MainActivity : AppCompatActivity() {
 
         binding.btnOpenAnrCasesDemo.setOnClickListener {
             startActivity(Intent(this, AnrCasesDemoActivity::class.java))
+        }
+
+        binding.btnOpenSettings.setOnClickListener {
+            startActivity(Intent(this, SettingsActivity::class.java))
         }
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.CREATED){

@@ -88,6 +88,7 @@
         <activity android:name=".performance.JankOnEnterActivity" />
         <activity android:name=".performance.MemoryLeakDemoActivity" />
         <activity android:name=".sentry.SentryDemoActivity" />
+        <activity android:name=".settings.SettingsActivity" />
         <activity android:name=".anrdemo.AnrCasesDemoActivity" />
         <activity android:name=".customview.JobSearchCollapseDemoActivity" />
         <activity android:name=".customview.PathAnimationDemoActivity" />
