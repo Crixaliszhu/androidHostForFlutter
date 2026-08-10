@@ -9,6 +9,7 @@ import android.os.SystemClock
 import androidx.appcompat.app.AppCompatActivity
 import com.example.hybriddemo.BuildConfig
 import com.example.hybriddemo.databinding.ActivityAnrCasesDemoBinding
+import com.example.qualitymonitor.QualityMonitorInitializer
 import java.io.File
 import java.io.FileOutputStream
 import java.util.concurrent.CountDownLatch
@@ -64,6 +65,15 @@ class AnrCasesDemoActivity : AppCompatActivity() {
         binding.btnInputAnr.setOnClickListener {
             showStatus("300ms 后主线程阻塞 15 秒；阻塞期间继续点击屏幕，更容易触发 Input dispatching timed out。")
             mainHandler.postDelayed({ blockMainThreadWithCpu() }, START_DELAY_MS)
+        }
+
+        binding.btnNativeCrash.setOnClickListener {
+            showStatus("300ms 后触发 Native 崩溃；重启后查看 files/quality_monitor/native_crash/*.qmon。")
+            mainHandler.postDelayed({
+                if (!QualityMonitorInitializer.triggerNativeCrashForTest()) {
+                    showStatus("Native crash 未触发：质量监控未初始化或 native so 加载失败。")
+                }
+            }, START_DELAY_MS)
         }
     }
 

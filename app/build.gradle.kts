@@ -24,6 +24,7 @@ fun sentryProperty(name: String): String {
 }
 
 fun selfMonitorProperty(name: String): String {
+    // 自研监控与 Sentry 使用不同前缀，方便后续在 CI 中单独灰度或切换内部上报域名。
     return localProperties.getProperty(name)
         ?: providers.environmentVariable(name).orNull
         ?: ""
@@ -71,8 +72,8 @@ android {
         // DSN 是 Sentry 项目的公开写入地址。这里通过 BuildConfig 暴露给运行时代码，
         // AndroidManifest 中已关闭 Sentry 自动初始化，避免 Provider 在 BuildConfig 可用前读取不到 DSN。
         buildConfigField("String", "SENTRY_DSN", "\"${sentryProperty("SENTRY_DSN")}\"")
-        // 自研 ANR 监控上报地址。未配置时只写入本地队列，避免 Demo 环境误打到不存在的服务。
-        buildConfigField("String", "SELF_ANR_REPORT_URL", "\"${selfMonitorProperty("SELF_ANR_REPORT_URL")}\"")
+        // 第一阶段自研质量监控统一上报地址，覆盖崩溃、ANR、启动和页面性能事件。
+        buildConfigField("String", "QUALITY_MONITOR_UPLOAD_URL", "\"${selfMonitorProperty("QUALITY_MONITOR_UPLOAD_URL")}\"")
         vectorDrawables {
             useSupportLibrary = true
         }
@@ -99,6 +100,8 @@ android {
             // Sentry 默认不在 debug 构建中上报 ANR，这里为了 Demo 明确打开。
             buildConfigField("boolean", "SENTRY_REPORT_ANR_IN_DEBUG", "true")
             buildConfigField("boolean", "SELF_ANR_ENABLED", "true")
+            // Debug 默认打开自研质量监控，便于本地验证崩溃、ANR、启动和页面事件是否落盘。
+            buildConfigField("boolean", "QUALITY_MONITOR_ENABLED", "true")
             resValue("bool", "android_god_eye_manual_install", "false")
             // GodEye 的 leakcanary 插件会手动安装 AppWatcher；关闭 LeakCanary 自带
             // ContentProvider 自动安装，避免启动时出现 "AppWatcher already installed"。
@@ -135,6 +138,8 @@ android {
             buildConfigField("boolean", "SENTRY_ATTACH_VIEW_HIERARCHY", sentryProperty("SENTRY_ATTACH_VIEW_HIERARCHY").ifBlank { "false" })
             buildConfigField("boolean", "SENTRY_REPORT_ANR_IN_DEBUG", "false")
             buildConfigField("boolean", "SELF_ANR_ENABLED", "true")
+            // Release 默认打开采集，真实上报地址仍由 local.properties 或 CI Secret 控制。
+            buildConfigField("boolean", "QUALITY_MONITOR_ENABLED", "true")
             resValue("bool", "android_god_eye_manual_install", "true")
             resValue("bool", "android_god_eye_need_notification", "false")
             resValue("integer", "android_god_eye_monitor_port", "5390")
@@ -283,5 +288,6 @@ dependencies {
 
     implementation(project(":flutter_engine"))
     implementation(project(":flutter_biz"))
-    implementation(project(":anr_monitor"))
+    // 第一阶段自研质量监控总入口，内部再复用独立 ANR 模块。
+    implementation(project(":quality_monitor"))
 }

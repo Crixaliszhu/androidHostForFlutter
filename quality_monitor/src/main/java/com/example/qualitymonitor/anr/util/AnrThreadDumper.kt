@@ -1,4 +1,4 @@
-package com.example.anrmonitor.util
+package com.example.qualitymonitor.anr.util
 
 import android.os.Looper
 

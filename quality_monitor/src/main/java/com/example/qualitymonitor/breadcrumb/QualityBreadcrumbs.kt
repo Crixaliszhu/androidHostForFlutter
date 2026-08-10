@@ -1,20 +1,26 @@
-package com.example.anrmonitor
+package com.example.qualitymonitor.breadcrumb
 
 import android.app.Activity
 import android.app.Application
 import android.os.Bundle
+import android.util.Log
 import java.util.ArrayDeque
 
 /**
- * 采集可安全附加到 ANR 事件中的粗粒度 Activity 行为轨迹。
+ * 质量事件面包屑采集器。
+ *
+ * 通过 Activity 生命周期记录最近页面路径和前后台状态，崩溃或 ANR 发生时可以还原用户
+ * 进入现场前的关键页面流转；这里只保存类名和生命周期事件，避免持有 Activity 实例导致泄露。
  */
-class AnrBreadcrumbs : Application.ActivityLifecycleCallbacks {
+class QualityBreadcrumbs : Application.ActivityLifecycleCallbacks {
     private val breadcrumbs = ArrayDeque<String>()
 
+    /** 当前可见或最近活跃 Activity 类名，只存字符串，不保留 Activity 引用。 */
     @Volatile
     var currentActivity: String? = null
         private set
 
+    /** 前后台状态，用 started Activity 计数计算，避免单个页面切换时误判后台。 */
     @Volatile
     var foreground: Boolean = false
         private set
@@ -31,6 +37,7 @@ class AnrBreadcrumbs : Application.ActivityLifecycleCallbacks {
         foreground = startedCount > 0
         currentActivity = activity.javaClass.name
         add("activity.started:${activity.javaClass.simpleName}")
+        Log.e("watchDog", "当前应用状态1：${foreground}")
     }
 
     override fun onActivityResumed(activity: Activity) {
@@ -46,6 +53,7 @@ class AnrBreadcrumbs : Application.ActivityLifecycleCallbacks {
         startedCount = (startedCount - 1).coerceAtLeast(0)
         foreground = startedCount > 0
         add("activity.stopped:${activity.javaClass.simpleName}")
+        Log.e("watchDog", "当前应用状态2：${foreground}")
     }
 
     override fun onActivitySaveInstanceState(activity: Activity, outState: Bundle) = Unit
@@ -60,6 +68,7 @@ class AnrBreadcrumbs : Application.ActivityLifecycleCallbacks {
     @Synchronized
     fun add(message: String) {
         breadcrumbs.addLast("${System.currentTimeMillis()}:$message")
+        // 只保留最近有限条，防止长时间运行后面包屑无限增长占用内存。
         while (breadcrumbs.size > MAX_BREADCRUMBS) {
             breadcrumbs.removeFirst()
         }
@@ -69,6 +78,6 @@ class AnrBreadcrumbs : Application.ActivityLifecycleCallbacks {
     fun snapshot(): List<String> = breadcrumbs.toList()
 
     companion object {
-        private const val MAX_BREADCRUMBS = 40
+        private const val MAX_BREADCRUMBS = 50
     }
 }

@@ -177,4 +177,20 @@ public class CalculateMain {
         return head.next;
     }
 
+    /**
+     * 获取链表中间节点：快慢指针，让快指针走完时，慢指针刚好停留在中间节点位置；
+     * @param head
+     * @return
+     */
+    public static IntListNode getLinkMediumNode(IntListNode head){
+        IntListNode fast = head;
+        IntListNode slow = head;
+        while (fast != null && fast.next != null && slow != null){
+            slow = slow.next;
+            fast = fast.next.next;
+        }
+
+        return slow;
+    }
+
 }

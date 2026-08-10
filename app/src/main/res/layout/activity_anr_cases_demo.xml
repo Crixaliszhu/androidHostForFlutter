@@ -82,5 +82,12 @@
             android:layout_marginTop="12dp"
             android:text="8. 输入事件超时：阻塞后继续点击屏幕" />
 
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnNativeCrash"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:text="Native Crash：触发自研 tombstone" />
+
     </LinearLayout>
 </ScrollView>

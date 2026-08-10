@@ -134,12 +134,12 @@ class RecruitHistoryRepositoryTest {
         val s3 = IntListNode(9, null)
         val s2 = IntListNode(8, s3)
         val s1 = IntListNode(3, s2)
-        val sHead = IntListNode(1, s1)
+        val sHead = IntListNode(1, s2)
 
 
         // [2,5,6,7], [1,3,8,9]
 //        val result = CalculateMain.mergeTwoLink(fHead, sHead)
-        val result = deleteReverseN(fHead, 3)
+        val result = CalculateMain.getLinkMediumNode(sHead)
         var iter = result
         println("打印答案 ==================================")
         while (iter.next != null) {

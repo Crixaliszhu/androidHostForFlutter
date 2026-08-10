@@ -50,7 +50,8 @@ dependencyResolutionManagement {
 rootProject.name = "FlutterHybridDemo"
 
 include(":app")
-include(":anr_monitor")
+// 第一阶段自研质量监控模块，负责统一接入崩溃、ANR、启动和页面耗时采集。
+include(":quality_monitor")
 include(":flutter_engine")
 include(":flutter_biz")
 

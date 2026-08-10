@@ -1,4 +1,4 @@
-package com.example.anrmonitor
+package com.example.qualitymonitor.anr
 
 import android.app.ActivityManager
 import android.app.Application
@@ -6,8 +6,9 @@ import android.app.ApplicationExitInfo
 import android.content.Context
 import android.os.Build
 import android.util.Log
-import com.example.anrmonitor.config.SelfAnrConfig
-import com.example.anrmonitor.entity.AnrEvent
+import com.example.qualitymonitor.anr.config.AnrMonitorConfig
+import com.example.qualitymonitor.anr.entity.AnrEvent
+import com.example.qualitymonitor.breadcrumb.QualityBreadcrumbs
 import java.util.UUID
 
 /**
@@ -15,8 +16,8 @@ import java.util.UUID
  */
 class AppExitAnrCollector(
     private val application: Application,
-    private val config: SelfAnrConfig,
-    private val breadcrumbs: AnrBreadcrumbs,
+    private val config: AnrMonitorConfig,
+    private val breadcrumbs: QualityBreadcrumbs,
     private val processNameProvider: () -> String,
 ) {
     private val preferences =
