@@ -8,6 +8,8 @@ import com.example.qualitymonitor.core.QualityEventStore
 import com.example.qualitymonitor.core.QualityUploader
 import com.example.qualitymonitor.crash.java.JavaCrashCollector
 import com.example.qualitymonitor.crash.nativecrash.NativeCrashCollector
+import com.example.qualitymonitor.memory.leak.LeakMonitor
+import com.example.qualitymonitor.memory.status.MemoryStateMonitor
 import com.example.qualitymonitor.performance.page.ActivityPagePerfMonitor
 import com.example.qualitymonitor.performance.page.PagePerf
 import com.example.qualitymonitor.performance.startup.StartupMonitor
@@ -48,6 +50,9 @@ object QualityMonitorInitializer {
         nativeCrashCollector = NativeCrashCollector(store).also { it.install() }
         StartupMonitor(application, config, store).install()
         ActivityPagePerfMonitor(application, store, config.activityOnPreDrawList).install()
+        // 内存状态和泄露监控依赖 Application 生命周期，统一在质量监控入口安装，避免业务层分散注册。
+        MemoryStateMonitor(application, config, store).install(application)
+        LeakMonitor(application, config, store).install(application)
 
         if (config.anrEnabled) {
             // ANR 采集已经并入质量监控模块，事件存储和上报都复用统一队列。

@@ -27,4 +27,22 @@ data class QualityMonitorConfig(
     val anrMaxTraceChars: Int = 180_000,
     /** 需要进行页面启动耗时统计的页面*/
     val activityOnPreDrawList: List<String>,
+    /** 是否启用内存状态监控；关闭后不注册周期采样和系统内存压力回调。 */
+    val memoryStateEnabled: Boolean = true,
+    /** 前台内存采样间隔；间隔过短会放大 Debug.MemoryInfo 和文件落盘的运行成本。 */
+    val memorySampleIntervalMillis: Long = 60_000L,
+    /** Java 堆使用率告警阈值；超过后额外写入 memory_warning，便于筛出高压现场。 */
+    val memoryJavaHeapWarningRatio: Double = 0.80,
+    /** PSS 告警阈值，单位 KB；小于等于 0 表示不按 PSS 触发告警。 */
+    val memoryTotalPssWarningKb: Int = 0,
+    /** 是否启用 Activity 泄露监控；第一阶段只观察 Activity，避免 Fragment 接入侵入业务。 */
+    val memoryLeakEnabled: Boolean = true,
+    /** Activity 销毁后首次检查延迟；太短容易把系统延迟回收误判为泄露。 */
+    val leakCheckDelayMillis: Long = 5_000L,
+    /** 疑似泄露后的确认延迟；二次检查仍未回收才会上报 confirmed 事件。 */
+    val leakConfirmDelayMillis: Long = 30_000L,
+    /** 疑似泄露数量达到该阈值后才允许 HPROF，可降低单个误判触发重型 dump 的概率。 */
+    val leakHprofRetainedThreshold: Int = 5,
+    /** 是否允许泄露确认后 dump HPROF；线上默认建议关闭，通过灰度或本地导出取证。 */
+    val leakHprofDumpEnabled: Boolean = false,
 )
