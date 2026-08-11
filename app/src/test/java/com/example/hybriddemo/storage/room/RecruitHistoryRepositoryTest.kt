@@ -20,14 +20,11 @@ class RecruitHistoryRepositoryTest {
 //        assertEquals("history_1", entity.id)
 //        assertEquals("招聘水电工", entity.title)
 //        assertEquals("重庆", entity.city)
-        val list = intArrayOf(1, 2, 5, 9, 0, 0, 0)
+        val list = intArrayOf(1, 2, -3, 5, -1, 2, 1, -5, 4)
         val list2 = intArrayOf(4, 7, 8)
 //        val arr = CalculateMain.twoNumberSum(list, 10)
-        val arr = mergeSortArr(list, 4, list2, 3)
-        println("答案是 ======================= >")
-        for (i in arr) {
-            println(i)
-        }
+        val arr = CalculateMain.getMaxChildArrSum(list)
+        println("答案是 ======================= > ${arr}")
     }
 
     /**
@@ -134,19 +131,13 @@ class RecruitHistoryRepositoryTest {
         val s3 = IntListNode(9, null)
         val s2 = IntListNode(8, s3)
         val s1 = IntListNode(3, s2)
-        val sHead = IntListNode(1, s2)
-
+        val sHead = IntListNode(1, s1)
+//        s3.next = sHead
 
         // [2,5,6,7], [1,3,8,9]
 //        val result = CalculateMain.mergeTwoLink(fHead, sHead)
-        val result = CalculateMain.getLinkMediumNode(sHead)
-        var iter = result
-        println("打印答案 ==================================")
-        while (iter.next != null) {
-            println("元素：${iter.node}")
-            iter = iter.next;
-        }
-        println("元素：${iter.node}")
+        val result = isLinkListLoop(sHead)
+        println("打印答案 ================================== ${result}")
     }
 
     /**
@@ -184,6 +175,24 @@ class RecruitHistoryRepositoryTest {
         slow.next = slow.next.next
         println("slow2 = ${slow.node}")
         return link
+    }
+
+
+    /**
+     * 判断链表是否有环：退出条件是关键
+     */
+    fun isLinkListLoop(head: IntListNode): Boolean {
+        var fast: IntListNode? = head
+        var slow: IntListNode? = head
+        while (fast != null && fast.next.next != null) {
+            fast = fast.next.next
+            slow = slow?.next
+            if (slow === fast) {
+                return true
+            }
+        }
+
+        return false
     }
 
     private class FakeRecruitHistoryDao : RecruitHistoryDao {

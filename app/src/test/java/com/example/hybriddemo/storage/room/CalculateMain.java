@@ -122,8 +122,24 @@ public class CalculateMain {
         int p1 = m - 1;
         int p2 = n - 1;
         int p = m + n - 1;
-        while (p1 >= 0 && p2 >= 0) {
-            if (arr[p1] > brr[p2]) {
+//        while (p1 >= 0 && p2 >= 0) {
+//            if (arr[p1] > brr[p2]) {
+//                arr[p] = arr[p1];
+//                p1--;
+//            } else {
+//                arr[p] = brr[p2];
+//                p2--;
+//            }
+//            p--;
+//        }
+//        while (p2 >= 0) {
+//            arr[p] = brr[p2];
+//            p2--;
+//            p--;
+//        }
+        while (p2 >= 0) {
+            // p1先遍历完，则还需要把p2放入p
+            if (p1 >= 0 && arr[p1] > brr[p2]) {
                 arr[p] = arr[p1];
                 p1--;
             } else {
@@ -132,12 +148,29 @@ public class CalculateMain {
             }
             p--;
         }
-        while (p2 >= 0) {
-            arr[p] = brr[p2];
-            p2--;
-            p--;
-        }
+
         return arr;
+    }
+
+    /**
+     * 给定你一个数组：元素有正有负，找出最大字数住和是多少？子数组最少一个元素
+     * [-2,1,-3,4,-1,2,1,-5,4]
+     * 最大子数组和为 6：[4,-1,2,1]
+     * @param nums
+     * @return
+     */
+    public static int getMaxChildArrSum(int[] nums){
+        int current = nums[0];
+        int max = nums[0];
+
+        for (int i = 1; i < nums.length; i++) {
+            // 如果从i位置新开子数组能得到更大的值，则新开，否则就把它加到子数组里计算和；
+            current = Math.max(nums[i], current + nums[i]);
+            // 记录当前最大的子数组和
+            max = Math.max(max, current);
+        }
+
+        return max;
     }
 
     public static int[] mergeShort(int[] nums1, int m, int[] nums2, int n) {
@@ -179,18 +212,45 @@ public class CalculateMain {
 
     /**
      * 获取链表中间节点：快慢指针，让快指针走完时，慢指针刚好停留在中间节点位置；
+     *
      * @param head
      * @return
      */
-    public static IntListNode getLinkMediumNode(IntListNode head){
+    public static IntListNode getLinkMediumNode(IntListNode head) {
         IntListNode fast = head;
         IntListNode slow = head;
-        while (fast != null && fast.next != null && slow != null){
+        while (fast != null && fast.next != null && slow != null) {
             slow = slow.next;
             fast = fast.next.next;
         }
 
         return slow;
+    }
+
+    /**
+     * 判断链表是否有环
+     * 分析：
+     * 如果链表没有环[1,2,3,5,null]，则尾指针后为null，循环时判断循环指针 == null则会退出循环；
+     * 如果链表有环[1,2,3,5,1]，则尾指针会指向头指针，循环退出条件为 找到相等的节点；
+     * <p>
+     * 需要两个指针，两个指针速度肯定不能一样，否则就会直接退出； 快慢指针；
+     *
+     * @return
+     */
+    public static Boolean isLinkLoop(IntListNode head) {
+        IntListNode fast = head;
+        IntListNode slow = head;
+
+        // 因为快指针跑得快，先指向null的概率大，能够更加早的退出循环；
+        while (fast != null && fast.next != null) {
+            fast = fast.next.next;
+            slow = slow.next;
+            if (slow == fast) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
 }
