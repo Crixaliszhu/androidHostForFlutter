@@ -39,8 +39,8 @@ val sentryProject = sentryProperty("SENTRY_PROJECT").ifBlank { "android" }
 // App 版本号集中在这里维护，避免 defaultConfig、APK 文件名、Sentry release 各写一份导致不一致。
 // SentryInitializer 会使用 BuildConfig.VERSION_NAME / VERSION_CODE 生成 release：
 // com.example.hybriddemo@1.0.2+261020。
-val appVersionName = "1.0.2"
-val appVersionCode = 261020
+val appVersionName = "1.0.3"
+val appVersionCode = 261030
 val appArchiveBaseName = "AndroidHostForFlutter-v$appVersionName-$appVersionCode"
 
 // Release 签名同样优先从 local.properties 读取，CI 中可改用环境变量。
