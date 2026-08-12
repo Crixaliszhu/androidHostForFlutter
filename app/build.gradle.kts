@@ -78,17 +78,37 @@ android {
         vectorDrawables {
             useSupportLibrary = true
         }
-
+        resourceConfigurations.addAll(listOf("zh","zh-rCN"))
         javaCompileOptions {
             annotationProcessorOptions {
                 arguments += "room.schemaLocation" to "$projectDir/schemas"
+            }
+        }
+
+        ndk {
+            abiFilters.add("armeabi-v7a")
+            abiFilters.add("arm64-v8a")
+        }
+
+        splits {
+            abi {
+                isEnable = true
+                reset()
+                include("armeabi-v7a","arm64-v8a")
+                isUniversalApk = true
+            }
+        }
+        packaging {
+            resources {
+                excludes.add("META-INF/*.kotlin_module")
             }
         }
     }
 
     buildTypes {
         getByName("debug") {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
+            isShrinkResources = true
             // 开发阶段使用独立环境，避免调试崩溃、手动卡顿、ANR Demo 污染线上指标。
             buildConfigField("String", "SENTRY_ENVIRONMENT", "\"debug-local\"")
             buildConfigField("boolean", "SENTRY_DEBUG", "true")
