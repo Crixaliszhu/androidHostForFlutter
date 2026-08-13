@@ -2,6 +2,7 @@ package com.example.hybriddemo.storage.room
 
 import com.example.hybriddemo.storage.room.dao.RecruitHistoryDao
 import com.example.hybriddemo.storage.room.table.RecruitHistoryEntity
+import com.example.hybriddemo.type.NormalPoint
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
@@ -25,6 +26,9 @@ class RecruitHistoryRepositoryTest {
 //        val arr = CalculateMain.twoNumberSum(list, 10)
         val arr = CalculateMain.getMaxChildArrSum(list)
         println("答案是 ======================= > ${arr}")
+
+        val np = NormalPoint(1,2,3)
+        println("${np.a}")
     }
 
     /**
