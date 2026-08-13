@@ -24,6 +24,13 @@ SENTRY_ATTACH_VIEW_HIERARCHY=false
 # 自研质量监控统一上报地址。未配置时事件只会落到 App 私有目录，便于本地查看。
 QUALITY_MONITOR_UPLOAD_URL=https://example.com/api/mobile/events/batch
 
+# quality_monitor 已迁移到独立 ServiceModule 项目，Demo 只通过 Maven AAR 依赖。
+# 本地验证时指向 ServiceModule 的 publishReleasePublicationToMavenRepository 产物目录。
+QUALITY_MONITOR_GROUP_ID=com.example.qualitymonitor
+QUALITY_MONITOR_ARTIFACT_ID=quality-monitor
+QUALITY_MONITOR_VERSION=1.0.0-SNAPSHOT
+QUALITY_MONITOR_REPO_URL=../servicemodule/quality_monitor/build/repo
+
 # Release 签名配置。keystore 和密码不能提交 Git，线上 CI 应放到 Secret。
 # RELEASE_STORE_FILE 可以是绝对路径，也可以是相对项目根目录的路径。
 RELEASE_STORE_FILE=/Users/<you>/secure/androidHostForFlutter-release.jks

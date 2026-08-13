@@ -30,6 +30,14 @@ fun selfMonitorProperty(name: String): String {
         ?: ""
 }
 
+fun qualityMonitorDependencyNotation(): String {
+    // quality_monitor 已迁移到独立 ServiceModule 项目，宿主 Demo 始终通过 Maven AAR 接入。
+    val groupId = selfMonitorProperty("QUALITY_MONITOR_GROUP_ID").ifBlank { "com.example.qualitymonitor" }
+    val artifactId = selfMonitorProperty("QUALITY_MONITOR_ARTIFACT_ID").ifBlank { "quality-monitor" }
+    val version = selfMonitorProperty("QUALITY_MONITOR_VERSION").ifBlank { "1.0.0-SNAPSHOT" }
+    return "$groupId:$artifactId:$version"
+}
+
 // SENTRY_AUTH_TOKEN 只用于构建期上传 R8/ProGuard mapping.txt，不会被打进 APK。
 // 如果没有配置 token，正式包仍可构建，只是 Sentry 后台无法自动还原混淆后的崩溃栈。
 val sentryAuthToken = sentryProperty("SENTRY_AUTH_TOKEN")
@@ -309,6 +317,6 @@ dependencies {
 
     implementation(project(":flutter_engine"))
     implementation(project(":flutter_biz"))
-    // 第一阶段自研质量监控总入口，内部再复用独立 ANR 模块。
-    implementation(project(":quality_monitor"))
+    // 第一阶段自研质量监控总入口，当前通过 ServiceModule 发布的 Maven AAR 接入。
+    implementation(qualityMonitorDependencyNotation())
 }

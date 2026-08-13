@@ -33,6 +33,11 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
+        // 自研 quality_monitor 已迁移到独立 ServiceModule 项目维护；默认读取其本地 Maven 发布目录。
+        val qualityMonitorRepoUrl = settings.gradleLocalProperty("QUALITY_MONITOR_REPO_URL")
+            ?: System.getenv("QUALITY_MONITOR_REPO_URL")
+            ?: "${rootDir}/../servicemodule/quality_monitor/build/repo"
+        maven { setUrl(uri(qualityMonitorRepoUrl)) }
         // AndroidGodEye 3.x 发布在 JCenter；Bintray/JCenter 关闭后，国内镜像更稳定。
         maven { setUrl("https://maven.aliyun.com/repository/jcenter") }
         // AndroidGodEye 的部分历史依赖仍托管在 JCenter，仅在开发期 debug 包使用。
@@ -52,8 +57,6 @@ rootProject.name = "FlutterHybridDemo"
 include(":app")
 // 马甲包演示模块：复用主 app 的源码和资源，只替换 applicationId、应用名等外壳配置。
 include(":app_vest")
-// 第一阶段自研质量监控模块，负责统一接入崩溃、ANR、启动和页面耗时采集。
-include(":quality_monitor")
 include(":flutter_engine")
 include(":flutter_biz")
 
@@ -78,4 +81,12 @@ fun Settings.flutterProjectDir(): String {
     }
     return localProps.getProperty("flutter.project.dir")
         ?: error("[FlutterHybridDemo] 请在 local.properties 中配置 flutter.project.dir")
+}
+
+fun Settings.gradleLocalProperty(name: String): String? {
+    val file = File(rootDir, "local.properties")
+    if (!file.exists()) return null
+    return Properties().apply { file.inputStream().use { load(it) } }
+        .getProperty(name)
+        ?.takeIf { it.isNotBlank() }
 }

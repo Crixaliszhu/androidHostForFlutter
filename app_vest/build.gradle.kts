@@ -20,6 +20,14 @@ fun localOrEnvProperty(name: String): String {
         ?: ""
 }
 
+fun qualityMonitorDependencyNotation(): String {
+    // quality_monitor 已迁移到独立 ServiceModule 项目，马甲包和主包保持同一 Maven AAR 接入方式。
+    val groupId = localOrEnvProperty("QUALITY_MONITOR_GROUP_ID").ifBlank { "com.example.qualitymonitor" }
+    val artifactId = localOrEnvProperty("QUALITY_MONITOR_ARTIFACT_ID").ifBlank { "quality-monitor" }
+    val version = localOrEnvProperty("QUALITY_MONITOR_VERSION").ifBlank { "1.0.0-SNAPSHOT" }
+    return "$groupId:$artifactId:$version"
+}
+
 val vestVersionName = "1.0.0"
 val vestVersionCode = 10000
 val vestApplicationId = "com.example.hybriddemo.vest"
@@ -200,5 +208,5 @@ dependencies {
 
     implementation(project(":flutter_engine"))
     implementation(project(":flutter_biz"))
-    implementation(project(":quality_monitor"))
+    implementation(qualityMonitorDependencyNotation())
 }
