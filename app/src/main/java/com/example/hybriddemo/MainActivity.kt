@@ -3,6 +3,7 @@ package com.example.hybriddemo
 import android.os.Bundle
 import android.content.Intent
 import android.os.SystemClock
+import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.coroutineScope
@@ -27,6 +28,7 @@ import com.example.hybriddemo.sentry.SentryDemoActivity
 import com.example.hybriddemo.service.page.ServiceDemoActivity
 import com.example.hybriddemo.service.workmanager.WorkManagerDemoActivity
 import com.example.hybriddemo.settings.SettingsActivity
+import com.example.hybriddemo.sf.CalculateUtils
 import com.example.hybriddemo.storage.demo.StorageBestPracticeActivity
 import com.example.hybriddemo.xbus.XBusMainActivity
 import kotlinx.coroutines.NonCancellable
@@ -75,6 +77,8 @@ class MainActivity : AppCompatActivity() {
         binding.btnPushTick.setOnClickListener {
             // 跨引擎广播：所有正在显示的 Flutter 页面（home 监听了）都会 +1。
             EventApiCaller.sendTick()
+            val result = CalculateUtils.firstBoundSearch(intArrayOf(1,4,6,8,8,8,10,14,16,19), 8)
+            Log.e("CalculateUtils"," 打印答案 ================================== ${result}")
         }
 
         binding.btnOpenHistoryDataBinding.setOnClickListener {

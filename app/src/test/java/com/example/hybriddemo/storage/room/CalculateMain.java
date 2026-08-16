@@ -156,10 +156,11 @@ public class CalculateMain {
      * 给定你一个数组：元素有正有负，找出最大字数住和是多少？子数组最少一个元素
      * [-2,1,-3,4,-1,2,1,-5,4]
      * 最大子数组和为 6：[4,-1,2,1]
+     *
      * @param nums
      * @return
      */
-    public static int getMaxChildArrSum(int[] nums){
+    public static int getMaxChildArrSum(int[] nums) {
         int current = nums[0];
         int max = nums[0];
 
@@ -249,8 +250,51 @@ public class CalculateMain {
                 return true;
             }
         }
-
         return false;
+    }
+
+    /**
+     * 二分查找：每次将target与中间值比较，排除一半元素
+     *
+     * @param nums
+     * @param target
+     * @return
+     */
+    public static int splitQuery(int[] nums, int target) {
+        int left = 0;
+        int right = nums.length;
+        while (left <= right) {
+            int mid = left + (right - left) / 2;
+            if (nums[mid] > target) {
+                right = mid - 1;
+            } else if (nums[mid] < target) {
+                left = mid + 1;
+            } else {
+                return mid;
+            }
+        }
+        return -1;
+    }
+
+    /**
+     * 二分查找左边界
+     *
+     * @param nums   [1,4,5,7,8,8,9,10,11,13,14]
+     * @param target
+     * @return
+     */
+    public static int getLeftBound(int[] nums, int target) {
+        int left = 0;
+        int right = nums.length;
+        while (left < right) {
+            int mid = left + (right - left) / 2;
+            if (nums[mid] > target) {
+                right = mid + 1;
+            } else {
+                left = mid;
+            }
+        }
+        return left;
     }
 
 }

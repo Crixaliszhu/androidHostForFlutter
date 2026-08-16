@@ -27,7 +27,7 @@ class RecruitHistoryRepositoryTest {
         val arr = CalculateMain.getMaxChildArrSum(list)
         println("答案是 ======================= > ${arr}")
 
-        val np = NormalPoint(1,2,3)
+        val np = NormalPoint(1, 2, 3)
         println("${np.a}")
     }
 
@@ -140,7 +140,7 @@ class RecruitHistoryRepositoryTest {
 
         // [2,5,6,7], [1,3,8,9]
 //        val result = CalculateMain.mergeTwoLink(fHead, sHead)
-        val result = isLinkListLoop(sHead)
+        val result = firstBoundSearch(intArrayOf(1,4,6,8,8,8,10,14,16,19), 8)
         println("打印答案 ================================== ${result}")
     }
 
@@ -197,6 +197,47 @@ class RecruitHistoryRepositoryTest {
         }
 
         return false
+    }
+
+    /**
+     * 二分查找：每次以中间值与目标值对比，排除一半数据
+     */
+    fun splitSort(list: IntArray, target: Int): Int {
+        var left = 0
+        var right = list.size - 1
+        while (left <= right) {
+            val mid = left + (right - left) / 2
+            when {
+                list[mid] > target -> right = mid - 1
+                list[mid] < target -> left = mid + 1
+                else -> return mid
+            }
+        }
+        return -1
+    }
+
+    /**
+     * 查找第一个相等的元素 下标
+     */
+    fun firstBoundSearch(nums: IntArray, target: Int): Int {
+        var left = 0;
+        var right = nums.size - 1;
+        if (left > right) return -1
+        var result = -1
+        // [1,2,3,4,5,5,5,6,7,8,9,10], 5
+        while (left <= right){
+            val mid = left + (right - left) / 2
+            if(nums[mid] == target){
+                result = mid
+                right = mid - 1
+            } else if(nums[mid] < target){
+                left = mid + 1
+            } else {
+                right = mid - 1
+            }
+        }
+
+        return result
     }
 
     private class FakeRecruitHistoryDao : RecruitHistoryDao {
