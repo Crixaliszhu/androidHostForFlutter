@@ -1,6 +1,7 @@
 package com.example.recruit
 
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -9,10 +10,15 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.alibaba.android.arouter.facade.annotation.Route
 import com.example.recruit.api.RecruitRouterApiPaths
+import com.example.recruit.ui.FloatingImageBall
 import com.example.recruit.ui.theme.FlutterHybridDemoTheme
 
 @Route(path = RecruitRouterApiPaths.RECRUIT_MAIN)
@@ -22,11 +28,27 @@ class RecruitmentMainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             FlutterHybridDemoTheme {
+                var showFloatingBall by rememberSaveable { mutableStateOf(true) }
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "招聘主页面",
-                        modifier = Modifier.padding(innerPadding)
-                    )
+                    androidx.compose.foundation.layout.Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(innerPadding),
+                    ) {
+                        Greeting(name = "招聘主页面")
+                        if (showFloatingBall) {
+                            FloatingImageBall(
+                                onClick = {
+                                    Toast.makeText(
+                                        this@RecruitmentMainActivity,
+                                        "点击了招聘浮标",
+                                        Toast.LENGTH_SHORT,
+                                    ).show()
+                                },
+                                onClose = { showFloatingBall = false },
+                            )
+                        }
+                    }
                 }
             }
         }
