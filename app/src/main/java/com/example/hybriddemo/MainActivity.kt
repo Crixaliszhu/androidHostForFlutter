@@ -20,6 +20,8 @@ import com.example.hybriddemo.router.DemoRouterPaths
 import com.example.hybriddemo.sf.CalculateUtils
 import com.example.recruit.api.IRecruitRouterService
 import com.example.recruit.api.RecruitRouterApiPaths
+import com.example.resume.api.IResumeRouterService
+import com.example.resume.api.ResumeRouterApiPaths
 import com.example.router.RouterApi
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.launch
@@ -73,8 +75,9 @@ class MainActivity : AppCompatActivity() {
         binding.btnPushTick.setOnClickListener {
             // 跨引擎广播：所有正在显示的 Flutter 页面（home 监听了）都会 +1。
             EventApiCaller.sendTick()
-            val result = CalculateUtils.firstBoundSearch(intArrayOf(1,4,6,8,8,8,10,14,16,19), 8)
-            Log.e("CalculateUtils"," 打印答案 ================================== ${result}")
+            val result =
+                CalculateUtils.firstBoundSearch(intArrayOf(1, 4, 6, 8, 8, 8, 10, 14, 16, 19), 8)
+            Log.e("CalculateUtils", " 打印答案 ================================== ${result}")
         }
 
         binding.btnOpenHistoryDataBinding.setOnClickListener {
@@ -152,6 +155,13 @@ class MainActivity : AppCompatActivity() {
                 IRecruitRouterService::class.java,
             )?.open(this)
         }
+
+        binding.btnResume.setOnClickListener {
+            RouterApi.getByPath(
+                ResumeRouterApiPaths.RESUME_ROUTER_SERVICE,
+                IResumeRouterService::class.java
+            )?.open(this)
+        }
     }
 
     private fun showAppVersion() {
@@ -167,11 +177,11 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    inline fun postBlock(block:() -> Unit){
+    inline fun postBlock(block: () -> Unit) {
         block()
     }
 
-    private fun test(){
+    private fun test() {
         postBlock {
             return@test
         }
@@ -180,7 +190,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    inline fun runBlock(crossinline block:()->Unit){
+    inline fun runBlock(crossinline block: () -> Unit) {
         block()
     }
 }

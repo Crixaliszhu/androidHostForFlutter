@@ -1,6 +1,5 @@
 import java.util.Properties
-
-include(":recruit")
+import java.util.Locale
 
 
 // =====================================================================
@@ -22,7 +21,6 @@ pluginManagement {
         id("com.android.library") version "8.6.0"
         id("org.jetbrains.kotlin.android") version "1.9.22"
         id("io.sentry.android.gradle") version "6.16.0"
-        id("com.android.application") version "8.6.0"
     }
 }
 
@@ -66,6 +64,9 @@ include(":router")
 include(":flutter_engine")
 include(":flutter_biz")
 include(":recruit")
+include(":recruit_api")
+include(":resume")
+include(":resume_api")
 
 // 2) 把 flutter_module 当成 Gradle 子工程引入。
 //    Flutter SDK 在 `<module>/.android/include_flutter.groovy` 里提供了这个胶水脚本，
@@ -97,4 +98,128 @@ fun Settings.gradleLocalProperty(name: String): String? {
         .getProperty(name)
         ?.takeIf { it.isNotBlank() }
 }
-include(":recruit_api")
+
+// 约定：开发者只需要在 settings.gradle.kts 中 include(":module_api")。
+// Sync 前自动补齐缺失的 API 模块目录和基础源码，已有目录不会被覆盖。
+val settingsIncludes = File(rootDir, "settings.gradle.kts")
+    .readLines()
+    .filterNot { it.trimStart().startsWith("//") }
+    .joinToString("\n")
+Regex("include\\(([^)]*)\\)")
+    .findAll(settingsIncludes)
+    .flatMap { match ->
+        Regex("[\\\"'](:[^\\\"']+)[\\\"']")
+            .findAll(match.groupValues[1])
+            .map { it.groupValues[1] }
+    }
+    .filter { it.substringAfterLast(":").endsWith("_api") }
+    .forEach { ensureApiModule(it) }
+
+fun ensureApiModule(apiProjectPath: String) {
+    val apiName = apiProjectPath.substringAfterLast(":")
+    val moduleName = apiName.removeSuffix("_api")
+    require(moduleName.isNotBlank()) { "API 模块名不能为空: $apiProjectPath" }
+
+    val apiDir = rootDir.resolve(apiProjectPath.toRelativeDir())
+    if (apiDir.exists()) return
+
+    val pascalName = moduleName.toPascalCase()
+    val packageName = "com.example.${moduleName.toPackageSegment()}.api"
+    val serviceName = "I${pascalName}RouterService"
+    val pathsName = "${pascalName}RouterApiPaths"
+    val servicePath = "/${moduleName.toPathSegment()}_api/service/${moduleName.toPathSegment()}-router"
+    val packageDir = apiDir.resolve("src/main/java/${packageName.replace('.', '/')}")
+
+    packageDir.mkdirs()
+    apiDir.resolve("src/main").mkdirs()
+    apiDir.resolve("build.gradle.kts").writeText(
+        """
+        plugins {
+            id("com.android.library")
+            id("org.jetbrains.kotlin.android")
+        }
+
+        android {
+            namespace = "$packageName"
+            compileSdk = 35
+
+            defaultConfig {
+                minSdk = 24
+                consumerProguardFiles("consumer-rules.pro")
+            }
+
+            compileOptions {
+                sourceCompatibility = JavaVersion.VERSION_17
+                targetCompatibility = JavaVersion.VERSION_17
+            }
+            kotlinOptions {
+                jvmTarget = "17"
+            }
+        }
+
+        dependencies {
+            api("com.alibaba:arouter-api:1.5.2")
+        }
+        """.trimIndent() + "\n"
+    )
+    apiDir.resolve("consumer-rules.pro").writeText("")
+    apiDir.resolve("src/main/AndroidManifest.xml").writeText(
+        """
+        <?xml version="1.0" encoding="utf-8"?>
+        <manifest />
+        """.trimIndent() + "\n"
+    )
+    packageDir.resolve("$pathsName.kt").writeText(
+        """
+        package $packageName
+
+        object $pathsName {
+            const val ${moduleName.toConstantPrefix()}_ROUTER_SERVICE = "$servicePath"
+        }
+        """.trimIndent() + "\n"
+    )
+    packageDir.resolve("$serviceName.kt").writeText(
+        """
+        package $packageName
+
+        import android.content.Context
+        import com.alibaba.android.arouter.facade.template.IProvider
+
+        interface $serviceName : IProvider {
+            fun open(context: Context)
+        }
+        """.trimIndent() + "\n"
+    )
+
+    logger.lifecycle("[FlutterHybridDemo] 已自动创建 API 模块: $apiProjectPath (${apiDir.absolutePath})")
+}
+
+fun String.toRelativeDir(): String = trim(':').replace(':', File.separatorChar)
+
+fun String.toPascalCase(): String {
+    return split(Regex("[^A-Za-z0-9]+"))
+        .filter { it.isNotBlank() }
+        .joinToString("") { part ->
+            part.replaceFirstChar { char ->
+                if (char.isLowerCase()) char.titlecase(Locale.US) else char.toString()
+            }
+        }
+}
+
+fun String.toPackageSegment(): String {
+    return lowercase(Locale.US).replace(Regex("[^a-z0-9_]"), "")
+        .takeIf { it.isNotBlank() } ?: "module"
+}
+
+fun String.toPathSegment(): String {
+    return lowercase(Locale.US).replace(Regex("[^a-z0-9]+"), "").trim('-')
+        .takeIf { it.isNotBlank() } ?: "module"
+}
+
+fun String.toConstantPrefix(): String {
+    return replace(Regex("([a-z])([A-Z])"), "$1_$2")
+        .replace(Regex("[^A-Za-z0-9]+"), "_")
+        .trim('_')
+        .uppercase(Locale.US)
+        .takeIf { it.isNotBlank() } ?: "MODULE"
+}
