@@ -1,7 +1,7 @@
 plugins {
     id("com.android.library")
     id("org.jetbrains.kotlin.android")
-    id("org.jetbrains.kotlin.kapt")
+    id("androidRouter")
 }
 
 android {
@@ -15,7 +15,6 @@ android {
         consumerProguardFiles("consumer-rules.pro")
         javaCompileOptions {
             annotationProcessorOptions {
-                arguments += "AROUTER_MODULE_NAME" to project.name
             }
         }
     }
@@ -63,5 +62,4 @@ dependencies {
     debugImplementation("androidx.compose.ui:ui-test-manifest")
     implementation(project(":router"))
     implementation(project(":resume_api"))
-    kapt("com.alibaba:arouter-compiler:1.5.2")
 }

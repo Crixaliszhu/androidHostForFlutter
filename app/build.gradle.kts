@@ -4,7 +4,7 @@ import com.android.build.gradle.internal.api.BaseVariantOutputImpl
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
-    id("org.jetbrains.kotlin.kapt")
+    id("androidRouter")
     id("io.sentry.android.gradle")
 }
 
@@ -90,7 +90,6 @@ android {
         javaCompileOptions {
             annotationProcessorOptions {
                 arguments += "room.schemaLocation" to "$projectDir/schemas"
-                arguments += "AROUTER_MODULE_NAME" to project.name
             }
         }
 
@@ -309,7 +308,6 @@ dependencies {
     implementation("androidx.room:room-ktx:2.6.1")
     implementation("androidx.work:work-runtime-ktx:2.9.1")
     implementation("io.sentry:sentry-android:8.51.0")
-    implementation("com.alibaba:arouter-api:1.5.2")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
 
     val androidGodEyeVersion = "3.4.3"
@@ -319,7 +317,6 @@ dependencies {
     debugImplementation("cn.hikyson.godeye:godeye-leakcanary:$androidGodEyeVersion")
 
     kapt("androidx.room:room-compiler:2.6.1")
-    kapt("com.alibaba:arouter-compiler:1.5.2")
     testImplementation("junit:junit:4.13.2")
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.8.1")
 
