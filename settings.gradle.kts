@@ -97,3 +97,4 @@ fun Settings.gradleLocalProperty(name: String): String? {
         .getProperty(name)
         ?.takeIf { it.isNotBlank() }
 }
+include(":recruit_api")

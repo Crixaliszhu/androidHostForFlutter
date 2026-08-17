@@ -11,8 +11,11 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import com.alibaba.android.arouter.facade.annotation.Route
+import com.example.recruit.api.RecruitRouterApiPaths
 import com.example.recruit.ui.theme.FlutterHybridDemoTheme
 
+@Route(path = RecruitRouterApiPaths.RECRUIT_MAIN)
 class RecruitmentMainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -21,7 +24,7 @@ class RecruitmentMainActivity : ComponentActivity() {
             FlutterHybridDemoTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     Greeting(
-                        name = "Android",
+                        name = "招聘主页面",
                         modifier = Modifier.padding(innerPadding)
                     )
                 }

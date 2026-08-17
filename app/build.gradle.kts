@@ -298,6 +298,7 @@ dependencies {
     implementation("androidx.compose.ui:ui-graphics")
     implementation("androidx.activity:activity:1.10.1")
     implementation("androidx.constraintlayout:constraintlayout:2.2.1")
+    implementation("androidx.activity:activity-ktx:1.8.1")
     androidTestImplementation(platform("androidx.compose:compose-bom:2024.04.01"))
     androidTestImplementation("androidx.compose.ui:ui-test-junit4")
     debugImplementation("androidx.compose.ui:ui-tooling")
@@ -326,6 +327,8 @@ dependencies {
     implementation(project(":router"))
     implementation(project(":flutter_engine"))
     implementation(project(":flutter_biz"))
+    implementation(project(":recruit_api"))
+    implementation(project(":recruit"))
     // 第一阶段自研质量监控总入口，当前通过 ServiceModule 发布的 Maven AAR 接入。
     implementation(qualityMonitorDependencyNotation())
 }

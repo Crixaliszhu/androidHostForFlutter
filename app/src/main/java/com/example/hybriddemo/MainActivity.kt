@@ -9,6 +9,8 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.coroutineScope
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import com.alibaba.android.arouter.launcher.ARouter
+import com.example.appapi.DemoRouterApiPaths
 import com.example.appapi.IDemoRouterService
 import com.example.flutterbiz.api.IFlutterRouterService
 import com.example.flutterbiz.api.ServiceLocator
@@ -16,6 +18,8 @@ import com.example.flutterbiz.bridge.EventApiCaller
 import com.example.hybriddemo.databinding.ActivityMainBinding
 import com.example.hybriddemo.router.DemoRouterPaths
 import com.example.hybriddemo.sf.CalculateUtils
+import com.example.recruit.api.IRecruitRouterService
+import com.example.recruit.api.RecruitRouterApiPaths
 import com.example.router.RouterApi
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.launch
@@ -35,7 +39,10 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
     private val demoRouter: IDemoRouterService?
-        get() = RouterApi.getByClass(IDemoRouterService::class.java)
+        get() = RouterApi.getByPath(
+            DemoRouterApiPaths.DEMO_ROUTER_SERVICE,
+            IDemoRouterService::class.java,
+        )
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -138,9 +145,12 @@ class MainActivity : AppCompatActivity() {
         binding.btnOpenSettings.setOnClickListener {
             demoRouter?.openSettings(this)
         }
-        lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.CREATED){
-            }
+
+        binding.btnRecruit.setOnClickListener {
+            RouterApi.getByPath(
+                RecruitRouterApiPaths.RECRUIT_ROUTER_SERVICE,
+                IRecruitRouterService::class.java,
+            )?.open(this)
         }
     }
 
