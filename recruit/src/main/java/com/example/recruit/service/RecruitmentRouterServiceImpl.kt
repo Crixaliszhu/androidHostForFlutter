@@ -6,7 +6,7 @@ import com.alibaba.android.arouter.launcher.ARouter
 import com.example.recruit.api.IRecruitRouterService
 import com.example.recruit.api.RecruitRouterApiPaths
 
-@Route(path = RecruitRouterApiPaths.RECRUIT_ROUTER_SERVICE)
+@Route(path = "/recruit_api/service/recruit-router")
 class RecruitmentRouterServiceImpl : IRecruitRouterService {
     override fun open(context: Context) {
         ARouter

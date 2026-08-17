@@ -151,7 +151,7 @@ class MainActivity : AppCompatActivity() {
 
         binding.btnRecruit.setOnClickListener {
             RouterApi.getByPath(
-                RecruitRouterApiPaths.RECRUIT_ROUTER_SERVICE,
+                "/recruit_api/service/recruit-router",
                 IRecruitRouterService::class.java,
             )?.open(this)
         }
