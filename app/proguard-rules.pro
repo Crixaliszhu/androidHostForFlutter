@@ -29,3 +29,9 @@
 # -keepclassmembers class com.example.hybriddemo.api.SomeLegacyDto {
 #     <fields>;
 # }
+
+# ARouter 运行期通过生成的路由表和模板接口装载页面，R8 场景下需要保留这些入口。
+-keep public class com.alibaba.android.arouter.routes.** { *; }
+-keep public class com.alibaba.android.arouter.facade.** { *; }
+-keep class * implements com.alibaba.android.arouter.facade.template.ISyringe { *; }
+-dontwarn javax.lang.model.element.Element

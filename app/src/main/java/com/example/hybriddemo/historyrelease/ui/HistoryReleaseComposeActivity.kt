@@ -37,6 +37,7 @@ import com.example.hybriddemo.historyrelease.model.HistoryReleaseDemoUiState
 import com.example.hybriddemo.historyrelease.presentation.HistoryReleaseDemoEvent
 import com.example.hybriddemo.historyrelease.presentation.HistoryReleaseDemoViewModel
 
+@com.alibaba.android.arouter.facade.annotation.Route(path = com.example.hybriddemo.router.DemoRouterPaths.HISTORY_COMPOSE)
 class HistoryReleaseComposeActivity : ComponentActivity() {
 
     private val vm by viewModels<HistoryReleaseDemoViewModel>()

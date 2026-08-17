@@ -16,6 +16,7 @@ import java.util.UUID
  * 3. 支持取消任务。
  * 4. 展示任务最终结果（成功 URL / 失败原因）。
  */
+@com.alibaba.android.arouter.facade.annotation.Route(path = com.example.hybriddemo.router.DemoRouterPaths.WORK_MANAGER)
 class WorkManagerDemoActivity : AppCompatActivity() {
 
     companion object {

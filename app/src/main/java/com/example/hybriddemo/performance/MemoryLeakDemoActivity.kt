@@ -9,6 +9,7 @@ import androidx.appcompat.app.AppCompatActivity
 import com.example.hybriddemo.databinding.ActivityMemoryLeakDemoBinding
 import java.nio.ByteBuffer
 
+@com.alibaba.android.arouter.facade.annotation.Route(path = com.example.hybriddemo.router.DemoRouterPaths.MEMORY_LEAK)
 class MemoryLeakDemoActivity : AppCompatActivity() {
 
     companion object {

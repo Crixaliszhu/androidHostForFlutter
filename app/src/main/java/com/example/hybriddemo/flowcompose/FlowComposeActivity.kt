@@ -34,6 +34,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
+@com.alibaba.android.arouter.facade.annotation.Route(path = com.example.hybriddemo.router.DemoRouterPaths.FLOW_COMPOSE)
 class FlowComposeActivity : ComponentActivity() {
 
     private val viewModel by viewModels<FlowComposeViewModel>()

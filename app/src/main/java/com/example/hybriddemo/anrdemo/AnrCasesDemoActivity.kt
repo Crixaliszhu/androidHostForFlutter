@@ -7,6 +7,7 @@ import android.os.Handler
 import android.os.Looper
 import android.os.SystemClock
 import androidx.appcompat.app.AppCompatActivity
+import com.alibaba.android.arouter.facade.annotation.Route
 import com.example.hybriddemo.BuildConfig
 import com.example.hybriddemo.databinding.ActivityAnrCasesDemoBinding
 import com.example.qualitymonitor.QualityMonitorInitializer
@@ -16,6 +17,7 @@ import java.util.concurrent.CountDownLatch
 import kotlin.concurrent.thread
 import kotlin.math.sqrt
 
+@Route(path = com.example.hybriddemo.router.DemoRouterPaths.ANR_CASES)
 class AnrCasesDemoActivity : AppCompatActivity() {
     private lateinit var binding: ActivityAnrCasesDemoBinding
     private val mainHandler = Handler(Looper.getMainLooper())

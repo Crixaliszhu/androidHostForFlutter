@@ -1,36 +1,22 @@
 package com.example.hybriddemo
 
 import android.os.Bundle
-import android.content.Intent
 import android.os.SystemClock
 import android.util.Log
+import com.alibaba.android.arouter.facade.annotation.Route
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.coroutineScope
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import com.example.appapi.IDemoRouterService
 import com.example.flutterbiz.api.IFlutterRouterService
 import com.example.flutterbiz.api.ServiceLocator
 import com.example.flutterbiz.bridge.EventApiCaller
 import com.example.hybriddemo.databinding.ActivityMainBinding
-import com.example.hybriddemo.anrdemo.AnrCasesDemoActivity
-import com.example.hybriddemo.customview.JobSearchCollapseDemoActivity
-import com.example.hybriddemo.customview.PathAnimationDemoActivity
-import com.example.hybriddemo.flowcompose.FlowComposeActivity
-import com.example.hybriddemo.historyrelease.ui.HistoryReleaseComposeActivity
-import com.example.hybriddemo.historyrelease.ui.HistoryReleaseDataBindingActivity
-import com.example.hybriddemo.historyrelease.ui.HistoryReleaseViewBindingActivity
-import com.example.hybriddemo.ipc.ui.IpcDemoActivity
-import com.example.hybriddemo.mediastore.PhotoPickerDemoActivity
-import com.example.hybriddemo.performance.JankOnEnterActivity
-import com.example.hybriddemo.performance.MemoryLeakDemoActivity
-import com.example.hybriddemo.sentry.SentryDemoActivity
-import com.example.hybriddemo.service.page.ServiceDemoActivity
-import com.example.hybriddemo.service.workmanager.WorkManagerDemoActivity
-import com.example.hybriddemo.settings.SettingsActivity
+import com.example.hybriddemo.router.DemoRouterPaths
 import com.example.hybriddemo.sf.CalculateUtils
-import com.example.hybriddemo.storage.demo.StorageBestPracticeActivity
-import com.example.hybriddemo.xbus.XBusMainActivity
+import com.example.router.RouterApi
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -44,9 +30,12 @@ import org.jetbrains.annotations.ApiStatus.NonExtendable
  * 2. 走独立引擎 + 携带参数打开 Flutter 详情页（验证「nativeParams 协议」）。
  * 3. 直接调 [EventApiCaller] 推一个 `tick` 事件给所有 Flutter 引擎。
  */
+@Route(path = DemoRouterPaths.MAIN)
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
+    private val demoRouter: IDemoRouterService?
+        get() = RouterApi.getByClass(IDemoRouterService::class.java)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -82,72 +71,72 @@ class MainActivity : AppCompatActivity() {
         }
 
         binding.btnOpenHistoryDataBinding.setOnClickListener {
-            startActivity(Intent(this, HistoryReleaseDataBindingActivity::class.java))
+            demoRouter?.openHistoryDataBinding(this)
         }
 
         binding.btnOpenHistoryViewBinding.setOnClickListener {
-            startActivity(Intent(this, HistoryReleaseViewBindingActivity::class.java))
+            demoRouter?.openHistoryViewBinding(this)
         }
 
         binding.btnOpenHistoryCompose.setOnClickListener {
-            startActivity(Intent(this, HistoryReleaseComposeActivity::class.java))
+            demoRouter?.openHistoryCompose(this)
         }
 
         binding.btnOpenFlowCompose.setOnClickListener {
-            startActivity(Intent(this, FlowComposeActivity::class.java))
+            demoRouter?.openFlowCompose(this)
         }
 
         binding.btnOpenStorageBestPractice.setOnClickListener {
-            startActivity(Intent(this, StorageBestPracticeActivity::class.java))
+            demoRouter?.openStorageBestPractice(this)
         }
 
         binding.btnXbusMain.setOnClickListener {
-            startActivity(Intent(this, XBusMainActivity::class.java))
+            demoRouter?.openXBusMain(this)
         }
 
         binding.btnService.setOnClickListener {
-            startActivity(Intent(this, ServiceDemoActivity::class.java))
+            demoRouter?.openService(this)
         }
 
         binding.btnWorkManager.setOnClickListener {
-            startActivity(Intent(this, WorkManagerDemoActivity::class.java))
+            demoRouter?.openWorkManager(this)
         }
 
         binding.btnPhotoPicker.setOnClickListener {
-            startActivity(Intent(this, PhotoPickerDemoActivity::class.java))
+            demoRouter?.openPhotoPicker(this)
         }
 
         binding.btnServiceMessenger.setOnClickListener {
-            startActivity(Intent(this, IpcDemoActivity::class.java))
+            demoRouter?.openIpc(this)
         }
 
         binding.btnOpenJankOnEnter.setOnClickListener {
-            startActivity(Intent(this, JankOnEnterActivity::class.java))
+            demoRouter?.openJankOnEnter(this)
         }
 
         binding.btnOpenMemoryLeakDemo.setOnClickListener {
-            startActivity(Intent(this, MemoryLeakDemoActivity::class.java))
+            demoRouter?.openMemoryLeak(this)
         }
 
         binding.btnOpenJobSearchCollapseDemo.setOnClickListener {
-            startActivity(Intent(this, JobSearchCollapseDemoActivity::class.java))
+            demoRouter?.openJobSearchCollapse(this)
         }
 
         binding.btnOpenPathAnimationDemo.setOnClickListener {
-            startActivity(Intent(this, PathAnimationDemoActivity::class.java))
+            demoRouter?.openPathAnimation(this)
 //            throw NullPointerException()
         }
 
         binding.btnOpenSentryDemo.setOnClickListener {
-            startActivity(Intent(this, SentryDemoActivity::class.java))
+            demoRouter?.openSentry(this)
         }
 
         binding.btnOpenAnrCasesDemo.setOnClickListener {
-            startActivity(Intent(this, AnrCasesDemoActivity::class.java))
+            demoRouter?.openAnrCases(this)
         }
 
         binding.btnOpenSettings.setOnClickListener {
-            startActivity(Intent(this, SettingsActivity::class.java))
+            demoRouter?.openSettings(this)
         }
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.CREATED){

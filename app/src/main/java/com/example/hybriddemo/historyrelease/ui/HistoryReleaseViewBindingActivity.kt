@@ -13,6 +13,7 @@ import com.example.hybriddemo.historyrelease.presentation.HistoryReleaseDemoEven
 import com.example.hybriddemo.historyrelease.presentation.HistoryReleaseDemoViewModel
 import kotlinx.coroutines.launch
 
+@com.alibaba.android.arouter.facade.annotation.Route(path = com.example.hybriddemo.router.DemoRouterPaths.HISTORY_VIEW_BINDING)
 class HistoryReleaseViewBindingActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityHistoryReleaseViewBindingBinding

@@ -2,12 +2,14 @@ package com.example.flutterbiz.bridge
 
 import android.app.Activity
 import android.os.Bundle
+import com.example.appapi.IDemoRouterService
 import com.example.flutterbiz.container.DemoFlutterActivity
 import com.example.flutterengine.entity.FlutterApiContext
 import com.example.flutterengine.entity.FlutterPageParams
 import com.example.flutterengine.manage.FlutterEngineManager
 import com.example.flutterengine.pigeon.RouteHostApi
 import com.example.flutterengine.registry.ApiRegistrar
+import com.example.router.RouterApi
 
 /**
  * 路由 HostApi。
@@ -51,13 +53,11 @@ class RouterHostApiImpl(
     }
 
     override fun pushNativeRoute(path: String, arguments: Map<String?, Any?>?) {
-        currentActivity()?.let { activity ->
-            android.widget.Toast.makeText(
-                activity,
-                "原生收到 pushNative：$path",
-                android.widget.Toast.LENGTH_SHORT,
-            ).show()
-        }
+        val activity = currentActivity() ?: return
+        val extras = arguments.orEmpty()
+            .filterKeys { it != null }
+            .mapKeys { it.key.orEmpty() }
+        RouterApi.getByClass(IDemoRouterService::class.java)?.openPath(activity, path, extras)
     }
 
     override fun pushFlutterRoute(path: String, arguments: Map<String?, Any?>?) {

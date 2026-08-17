@@ -14,6 +14,7 @@ import com.example.hybriddemo.databinding.ActivityJankOnEnterBinding
  *
  * 真实业务中这类工作应拆到后台线程、懒加载、分页加载或首帧后再执行。
  */
+@com.alibaba.android.arouter.facade.annotation.Route(path = com.example.hybriddemo.router.DemoRouterPaths.JANK_ON_ENTER)
 class JankOnEnterActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityJankOnEnterBinding

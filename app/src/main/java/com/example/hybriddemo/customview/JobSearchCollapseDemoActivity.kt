@@ -8,6 +8,7 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.widget.NestedScrollView
 
+@com.alibaba.android.arouter.facade.annotation.Route(path = com.example.hybriddemo.router.DemoRouterPaths.JOB_SEARCH_COLLAPSE)
 class JobSearchCollapseDemoActivity : AppCompatActivity() {
 
     private lateinit var headerView: CollapsibleSearchHeaderView

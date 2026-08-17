@@ -1,7 +1,7 @@
 package com.example.hybriddemo.xbus
 
-import android.content.Intent
 import android.os.Bundle
+import com.alibaba.android.arouter.facade.annotation.Route
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -21,9 +21,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.appapi.IDemoRouterService
+import com.example.hybriddemo.router.DemoRouterPaths
 import com.example.hybriddemo.xbus.vm.XBusMainUIState
 import com.example.hybriddemo.xbus.vm.XBusMainViewModel
+import com.example.router.RouterApi
 
+@Route(path = DemoRouterPaths.XBUS_MAIN)
 class XBusMainActivity : ComponentActivity() {
     private val vm by viewModels<XBusMainViewModel>()
 
@@ -44,7 +48,7 @@ class XBusMainActivity : ComponentActivity() {
     }
 
     private fun routeToSend() {
-        startActivity(Intent(this, XBusSendActivity::class.java))
+        RouterApi.getByClass(IDemoRouterService::class.java)?.openXBusSend(this)
     }
 
     private fun initObserver(){

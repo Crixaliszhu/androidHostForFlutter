@@ -23,6 +23,7 @@ import com.example.hybriddemo.databinding.ActivityPhotoPickerDemoBinding
  * 2. MediaStore 查询（手动 ContentResolver.query，需要权限）。
  * 3. Intent ACTION_OPEN_DOCUMENT 打开系统文件选择器（类似 openAlbum 的底层原理）。
  */
+@com.alibaba.android.arouter.facade.annotation.Route(path = com.example.hybriddemo.router.DemoRouterPaths.PHOTO_PICKER)
 class PhotoPickerDemoActivity : AppCompatActivity() {
 
     companion object {

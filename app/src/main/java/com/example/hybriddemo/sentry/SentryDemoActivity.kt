@@ -12,6 +12,7 @@ import io.sentry.Sentry
 import io.sentry.SentryLevel
 import io.sentry.SpanStatus
 
+@com.alibaba.android.arouter.facade.annotation.Route(path = com.example.hybriddemo.router.DemoRouterPaths.SENTRY)
 class SentryDemoActivity : AppCompatActivity() {
     private lateinit var binding: ActivitySentryDemoBinding
     private val mainHandler = Handler(Looper.getMainLooper())

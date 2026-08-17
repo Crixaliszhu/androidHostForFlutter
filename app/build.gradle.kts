@@ -90,6 +90,7 @@ android {
         javaCompileOptions {
             annotationProcessorOptions {
                 arguments += "room.schemaLocation" to "$projectDir/schemas"
+                arguments += "AROUTER_MODULE_NAME" to project.name
             }
         }
 
@@ -117,6 +118,10 @@ android {
         getByName("debug") {
             isMinifyEnabled = true
             isShrinkResources = true
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
             // 开发阶段使用独立环境，避免调试崩溃、手动卡顿、ANR Demo 污染线上指标。
             buildConfigField("String", "SENTRY_ENVIRONMENT", "\"debug-local\"")
             buildConfigField("boolean", "SENTRY_DEBUG", "true")
@@ -303,6 +308,7 @@ dependencies {
     implementation("androidx.room:room-ktx:2.6.1")
     implementation("androidx.work:work-runtime-ktx:2.9.1")
     implementation("io.sentry:sentry-android:8.51.0")
+    implementation("com.alibaba:arouter-api:1.5.2")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
 
     val androidGodEyeVersion = "3.4.3"
@@ -312,9 +318,12 @@ dependencies {
     debugImplementation("cn.hikyson.godeye:godeye-leakcanary:$androidGodEyeVersion")
 
     kapt("androidx.room:room-compiler:2.6.1")
+    kapt("com.alibaba:arouter-compiler:1.5.2")
     testImplementation("junit:junit:4.13.2")
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.8.1")
 
+    implementation(project(":app_api"))
+    implementation(project(":router"))
     implementation(project(":flutter_engine"))
     implementation(project(":flutter_biz"))
     // 第一阶段自研质量监控总入口，当前通过 ServiceModule 发布的 Maven AAR 接入。

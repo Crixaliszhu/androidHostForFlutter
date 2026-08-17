@@ -1,5 +1,8 @@
 import java.util.Properties
 
+include(":recruit")
+
+
 // =====================================================================
 // FlutterHybridDemo / android_host
 // 演示原生侧如何把同级 flutter_module 当 Gradle 子工程引入（本地源码模式）。
@@ -19,6 +22,7 @@ pluginManagement {
         id("com.android.library") version "8.6.0"
         id("org.jetbrains.kotlin.android") version "1.9.22"
         id("io.sentry.android.gradle") version "6.16.0"
+        id("com.android.application") version "8.6.0"
     }
 }
 
@@ -57,8 +61,11 @@ rootProject.name = "FlutterHybridDemo"
 include(":app")
 // 马甲包演示模块：复用主 app 的源码和资源，只替换 applicationId、应用名等外壳配置。
 include(":app_vest")
+include(":app_api")
+include(":router")
 include(":flutter_engine")
 include(":flutter_biz")
+include(":recruit")
 
 // 2) 把 flutter_module 当成 Gradle 子工程引入。
 //    Flutter SDK 在 `<module>/.android/include_flutter.groovy` 里提供了这个胶水脚本，

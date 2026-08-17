@@ -6,6 +6,7 @@ import android.widget.LinearLayout
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.button.MaterialButton
 
+@com.alibaba.android.arouter.facade.annotation.Route(path = com.example.hybriddemo.router.DemoRouterPaths.PATH_ANIMATION)
 class PathAnimationDemoActivity : AppCompatActivity() {
 
     // 保存自定义 View 引用，底部按钮直接调用它暴露的控制方法。

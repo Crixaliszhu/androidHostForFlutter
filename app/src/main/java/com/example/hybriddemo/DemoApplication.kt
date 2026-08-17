@@ -2,6 +2,7 @@ package com.example.hybriddemo
 
 import android.app.Application
 import android.os.SystemClock
+import com.alibaba.android.arouter.launcher.ARouter
 import com.example.flutterbiz.DemoFlutterInitManager
 import com.example.hybriddemo.sentry.SentryInitializer
 import com.example.qualitymonitor.QualityMonitorConfig
@@ -22,6 +23,11 @@ class DemoApplication : Application() {
 
     override fun onCreate() {
         super.onCreate()
+        if (BuildConfig.DEBUG) {
+            ARouter.openLog()
+            ARouter.openDebug()
+        }
+        ARouter.init(this)
         SentryInitializer.init(this)
         // 自研质量监控尽量靠前初始化，保证后续初始化阶段的崩溃和启动耗时也能被采集。
         QualityMonitorInitializer.init(

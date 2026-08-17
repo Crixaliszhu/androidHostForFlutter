@@ -32,6 +32,7 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 
+@com.alibaba.android.arouter.facade.annotation.Route(path = com.example.hybriddemo.router.DemoRouterPaths.STORAGE_BEST_PRACTICE)
 class StorageBestPracticeActivity : ComponentActivity() {
 
     private val vm by viewModels<StorageBestPracticeViewModel>()

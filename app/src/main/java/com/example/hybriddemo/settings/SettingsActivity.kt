@@ -18,6 +18,7 @@ import kotlinx.coroutines.withContext
  * 当前只承载自研质量监控日志导出能力；正式包不能 run-as 读取私有目录，
  * 所以这里通过系统文件选择器把日志 zip 写到用户指定位置。
  */
+@com.alibaba.android.arouter.facade.annotation.Route(path = com.example.hybriddemo.router.DemoRouterPaths.SETTINGS)
 class SettingsActivity : AppCompatActivity() {
     private lateinit var binding: ActivitySettingsBinding
 

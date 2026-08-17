@@ -12,6 +12,7 @@ import kotlinx.coroutines.launch
 /**
  * 进程通信demo
  */
+@com.alibaba.android.arouter.facade.annotation.Route(path = com.example.hybriddemo.router.DemoRouterPaths.IPC)
 class IpcDemoActivity : AppCompatActivity() {
     companion object{
         const val TAG = "IpcDemoActivity"

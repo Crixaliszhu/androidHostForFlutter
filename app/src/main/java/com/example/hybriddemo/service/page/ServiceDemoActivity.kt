@@ -16,6 +16,7 @@ import com.example.hybriddemo.databinding.ActivityServiceDemoBinding
 import com.example.hybriddemo.service.bind_ervice.FloatDemoService
 import com.example.hybriddemo.service.bind_ervice.SyncDemoService
 
+@com.alibaba.android.arouter.facade.annotation.Route(path = com.example.hybriddemo.router.DemoRouterPaths.SERVICE)
 class ServiceDemoActivity : AppCompatActivity() {
 
     companion object {
