@@ -328,8 +328,8 @@ dependencies {
     implementation(project(":flutter_engine"))
     implementation(project(":flutter_biz"))
     implementation(project(":recruit_api"))
-    implementation(project(":recruit"))
     implementation(project(":resume_api"))
+    implementation(project(":business_bundle"))
     // 第一阶段自研质量监控总入口，当前通过 ServiceModule 发布的 Maven AAR 接入。
     implementation(qualityMonitorDependencyNotation())
 }
