@@ -13,6 +13,7 @@ import com.example.flutterengine.registry.ApiRegistrar
 import com.example.flutterengine.registry.FlutterApiRegistry
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.BinaryMessenger
+import io.flutter.plugins.GeneratedPluginRegistrant
 import kotlin.reflect.KClass
 
 /**
@@ -183,6 +184,7 @@ object FlutterEngineManager {
     // ---------------- 内部 ----------------
 
     private fun onEngineCreated(engine: FlutterEngine, engineId: String): List<ApiRegistrar> {
+        GeneratedPluginRegistrant.registerWith(engine)
         val ctx = FlutterApiContext(engineId, engine.dartExecutor.binaryMessenger)
         val apis = bizHandlerApi?.invoke(ctx).orEmpty()
         FlutterApiRegistry.performRegister(apis)

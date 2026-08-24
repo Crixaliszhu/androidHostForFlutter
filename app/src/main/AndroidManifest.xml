@@ -93,6 +93,7 @@
         <activity android:name=".customview.JobSearchCollapseDemoActivity" />
         <activity android:name=".customview.PathAnimationDemoActivity" />
         <activity android:name="com.example.hybriddemo.ipc.ui.IpcDemoActivity" />
+        <activity android:name="com.example.hybriddemo.life.LifecycleMainActivity" />
     </application>
 
 </manifest>

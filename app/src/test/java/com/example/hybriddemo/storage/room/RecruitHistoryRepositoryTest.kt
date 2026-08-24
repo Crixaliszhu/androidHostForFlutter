@@ -24,11 +24,48 @@ class RecruitHistoryRepositoryTest {
         val list = intArrayOf(1, 2, -3, 5, -1, 2, 1, -5, 4)
         val list2 = intArrayOf(4, 7, 8)
 //        val arr = CalculateMain.twoNumberSum(list, 10)
-        val arr = CalculateMain.getMaxChildArrSum(list)
-        println("答案是 ======================= > ${arr}")
+        val s2 = IntListNode(1, null)
+        val s1 = IntListNode(2, s2)
+
+        val l5 = IntListNode(7, null)
+        val l4 = IntListNode(6, l5)
+        val l3 = IntListNode(5, l4)
+        val l2 = IntListNode(4, l3)
+        s2.next = l4
+        val l1 = IntListNode(3, l2)
+
+
+        val arr = findIntersectionNode(s1, l1)
+        println("答案是 ======================= > ${arr?.node}")
 
         val np = NormalPoint(1, 2, 3)
         println("${np.a}")
+    }
+
+    /**
+     * 找出相交的节点,不相交，则返回null
+     *  相交的链表会形成Y自行；
+     *    first: 先走1，再走2
+     *    second：先走2，再走1
+     *    完成的长度都一样，所以在终点相遇，相交的节点就是终点；
+     */
+    fun findIntersectionNode(link1: IntListNode, link2: IntListNode): IntListNode? {
+        var first: IntListNode? = link1
+        var second: IntListNode? = link2
+        while (first !== second) {
+            first = if (first == null) {
+                link2
+            } else {
+                first.next
+            }
+
+            second = if (second == null) {
+                link1
+            } else {
+                second.next
+            }
+        }
+        return first
     }
 
     /**
@@ -140,7 +177,7 @@ class RecruitHistoryRepositoryTest {
 
         // [2,5,6,7], [1,3,8,9]
 //        val result = CalculateMain.mergeTwoLink(fHead, sHead)
-        val result = firstBoundSearch(intArrayOf(1,4,6,8,8,8,10,14,16,19), 8)
+        val result = firstBoundSearch(intArrayOf(1, 4, 6, 8, 8, 8, 10, 14, 16, 19), 8)
         println("打印答案 ================================== ${result}")
     }
 
@@ -225,12 +262,12 @@ class RecruitHistoryRepositoryTest {
         if (left > right) return -1
         var result = -1
         // [1,2,3,4,5,5,5,6,7,8,9,10], 5
-        while (left <= right){
+        while (left <= right) {
             val mid = left + (right - left) / 2
-            if(nums[mid] == target){
+            if (nums[mid] == target) {
                 result = mid
                 right = mid - 1
-            } else if(nums[mid] < target){
+            } else if (nums[mid] < target) {
                 left = mid + 1
             } else {
                 right = mid - 1
