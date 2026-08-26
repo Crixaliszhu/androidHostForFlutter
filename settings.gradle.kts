@@ -20,6 +20,8 @@ pluginManagement {
         id("com.android.application") version "8.6.0"
         id("com.android.library") version "8.6.0"
         id("org.jetbrains.kotlin.android") version "1.9.22"
+        id("org.jetbrains.kotlin.jvm") version "1.9.22"
+        id("io.gitlab.arturbosch.detekt") version "1.23.7"
         id("io.sentry.android.gradle") version "6.16.0"
     }
 }
@@ -60,7 +62,7 @@ include(":app")
 // 马甲包演示模块：复用主 app 的源码和资源，只替换 applicationId、应用名等外壳配置。
 include(":app_vest")
 include(":app_api")
-include(":lint-rules")
+include(":customRules")
 include(":router")
 include(":flutter_engine")
 include(":flutter_biz")

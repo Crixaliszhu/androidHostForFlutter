@@ -1,0 +1,17 @@
+#!/bin/sh
+set -eu
+
+changed_files="$(git diff --cached --name-only --diff-filter=ACMR -- '*.kt' '*.kts' | paste -sd, -)"
+
+if [ -z "$changed_files" ]; then
+  echo "No staged Kotlin files, skip detekt."
+  exit 0
+fi
+
+echo "Running detekt on staged Kotlin files..."
+if [ -x "./gradlew" ]; then
+  ./gradlew detektChanged -PdetektChangedFiles="$changed_files"
+else
+  ./gradlew.bat detektChanged -PdetektChangedFiles="$changed_files"
+fi
+echo "Detekt passed."

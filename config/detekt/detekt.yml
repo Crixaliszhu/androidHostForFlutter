@@ -1,0 +1,20 @@
+build:
+  maxIssues: 0
+
+config:
+  validation: false
+  warningsAsErrors: false
+
+processors:
+  active: false
+
+console-reports:
+  active: true
+
+output-reports:
+  active: true
+
+project-rules:
+  active: true
+  DataClassContract:
+    active: true

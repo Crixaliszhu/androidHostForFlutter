@@ -1,5 +1,7 @@
 import com.android.build.api.dsl.ApplicationExtension
 import com.android.build.api.dsl.LibraryExtension
+import io.gitlab.arturbosch.detekt.Detekt
+import io.gitlab.arturbosch.detekt.extensions.DetektExtension
 import java.util.Locale
 
 // 顶层 build.gradle.kts。
@@ -12,7 +14,21 @@ plugins {
     id("com.android.application") version "8.6.0" apply false
     id("com.android.library") version "8.6.0" apply false
     id("org.jetbrains.kotlin.android") version "1.9.22" apply false
+    id("org.jetbrains.kotlin.jvm") version "1.9.22" apply false
+    id("io.gitlab.arturbosch.detekt") version "1.23.7"
     id("io.sentry.android.gradle") version "6.16.0" apply false
+}
+
+val detektConfigFile = rootProject.layout.projectDirectory.file("config/detekt/detekt.yml")
+
+detekt {
+    config.setFrom(detektConfigFile)
+    buildUponDefaultConfig = false
+    ignoreFailures = false
+}
+
+dependencies {
+    detektPlugins(project(":customRules"))
 }
 
 fun Project.isLocalAndroidHostProject(): Boolean {
@@ -34,7 +50,7 @@ subprojects {
                 xmlReport = true
             }
         }
-        dependencies.add("lintChecks", project(":lint-rules"))
+        configureProjectDetekt()
     }
 
     pluginManager.withPlugin("com.android.library") {
@@ -49,7 +65,70 @@ subprojects {
                 xmlReport = true
             }
         }
-        dependencies.add("lintChecks", project(":lint-rules"))
+        configureProjectDetekt()
+    }
+}
+
+fun Project.configureProjectDetekt() {
+    pluginManager.apply("io.gitlab.arturbosch.detekt")
+    dependencies.add("detektPlugins", rootProject.project(":customRules"))
+
+    extensions.configure<DetektExtension>("detekt") {
+        config.setFrom(rootProject.files(detektConfigFile))
+        buildUponDefaultConfig = false
+        ignoreFailures = false
+        source.setFrom(
+            files(
+                "src/main/java",
+                "src/main/kotlin",
+                "src/test/java",
+                "src/test/kotlin",
+                "src/androidTest/java",
+                "src/androidTest/kotlin",
+            )
+        )
+    }
+
+    tasks.withType<Detekt>().configureEach {
+        jvmTarget = "17"
+        reports {
+            html.required.set(true)
+            xml.required.set(false)
+            txt.required.set(true)
+            sarif.required.set(false)
+        }
+    }
+}
+
+val detektChangedFilePaths = providers.gradleProperty("detektChangedFiles").orNull
+    ?.split(',')
+    ?.map { it.trim() }
+    ?.filter { it.isNotEmpty() }
+    ?.map { rootProject.file(it) }
+    ?.filter { it.isFile }
+    .orEmpty()
+
+tasks.register<Detekt>("detektChanged") {
+    group = "verification"
+    description = "Runs detekt project rules only on staged Kotlin files passed by -PdetektChangedFiles."
+
+    setSource(detektChangedFilePaths)
+    include("**/*.kt", "**/*.kts")
+    exclude("**/build/**")
+    config.setFrom(detektConfigFile)
+    buildUponDefaultConfig = false
+    ignoreFailures = false
+    jvmTarget = "17"
+
+    reports {
+        html.required.set(true)
+        xml.required.set(false)
+        txt.required.set(true)
+        sarif.required.set(false)
+    }
+
+    onlyIf {
+        detektChangedFilePaths.isNotEmpty()
     }
 }
 
