@@ -60,6 +60,17 @@ class RecruitmentMainActivity : ComponentActivity() {
                             ) {
                                 Text("打开 View 浮标演示")
                             }
+                            Button(
+                                onClick = {
+                                    Toast.makeText(
+                                        this@RecruitmentMainActivity,
+                                        "这是Recruit页toast",
+                                        Toast.LENGTH_SHORT,
+                                    ).show()
+                                },
+                            ) {
+                                Text("显示招聘 Toast")
+                            }
                         }
                         if (showFloatingBall) {
                             FloatingImageBall(
