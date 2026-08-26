@@ -4,17 +4,11 @@ import android.content.Intent
 import android.content.pm.ShortcutInfo
 import android.content.pm.ShortcutManager
 import android.graphics.drawable.Icon
-import android.os.Build
 import android.os.Bundle
 import android.os.SystemClock
 import android.util.Log
-import com.alibaba.android.arouter.facade.annotation.Route
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.coroutineScope
-import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
-import com.alibaba.android.arouter.launcher.ARouter
+import com.alibaba.android.arouter.facade.annotation.Route
 import com.example.appapi.DemoRouterApiPaths
 import com.example.appapi.IDemoRouterService
 import com.example.flutterbiz.api.IFlutterRouterService
@@ -24,16 +18,10 @@ import com.example.hybriddemo.databinding.ActivityMainBinding
 import com.example.hybriddemo.launch.LaunchThreadPoolFactory
 import com.example.hybriddemo.router.DemoRouterPaths
 import com.example.hybriddemo.sf.CalculateUtils
-import com.example.hybriddemo.thread.PriorityTask
 import com.example.recruit.api.IRecruitRouterService
-import com.example.recruit.api.RecruitRouterApiPaths
 import com.example.resume.api.IResumeRouterService
 import com.example.resume.api.ResumeRouterApiPaths
 import com.example.router.RouterApi
-import kotlinx.coroutines.NonCancellable
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import org.jetbrains.annotations.ApiStatus.NonExtendable
 
 /**
  * 宿主 App 主页面。
@@ -170,25 +158,11 @@ class MainActivity : AppCompatActivity() {
         }
 
         binding.btnResume.setOnClickListener {
-//            RouterApi.getByPath(
-//                ResumeRouterApiPaths.RESUME_ROUTER_SERVICE,
-//                IResumeRouterService::class.java
-//            )?.open(this)
-            submitResult()
+            RouterApi.getByPath(
+                ResumeRouterApiPaths.RESUME_ROUTER_SERVICE,
+                IResumeRouterService::class.java
+            )?.open(this)
         }
-    }
-
-    private fun submitResult(){
-        LaunchThreadPoolFactory.submit(PriorityTask(1){
-            Log.e("LaunchThreadPoolFactory","任务1")
-        })
-
-        LaunchThreadPoolFactory.submit(PriorityTask(10){
-            Log.e("LaunchThreadPoolFactory","任务10")
-        })
-        LaunchThreadPoolFactory.submit(PriorityTask(2){
-            Log.e("LaunchThreadPoolFactory","任务 2")
-        })
     }
 
     private fun showAppVersion() {
