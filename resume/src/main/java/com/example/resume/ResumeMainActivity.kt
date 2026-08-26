@@ -3,6 +3,8 @@ package com.example.resume
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.widget.Button
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.enableEdgeToEdge
 import androidx.core.view.ViewCompat
@@ -31,6 +33,9 @@ class ResumeMainActivity : ComponentActivity() {
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
+        }
+        findViewById<Button>(R.id.btn_resume_toast).setOnClickListener {
+            Toast.makeText(this, "这是Resume页toast", Toast.LENGTH_SHORT).show()
         }
     }
 }
