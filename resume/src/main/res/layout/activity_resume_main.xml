@@ -36,14 +36,35 @@
             android:textStyle="bold" />
     </LinearLayout>
 
-    <Button
-        android:id="@+id/btn_resume_toast"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="显示 Resume Toast"
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/resume_content"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:padding="16dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/resume_title_bar" />
+        app:layout_constraintTop_toBottomOf="@id/resume_title_bar">
+
+        <TextView
+            android:id="@+id/tv_resume_boss_count"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="今日招工老板人数：100人"
+            android:textColor="#111111"
+            android:textSize="16sp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <Button
+            android:id="@+id/btn_resume_toast"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="显示 Resume Toast"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tv_resume_boss_count" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
