@@ -1,6 +1,7 @@
 package com.example.recruit
 
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.Button
 import android.widget.Toast
@@ -14,6 +15,7 @@ class FloatingBallDemoActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        Log.e(RecruitmentMainActivity.TAG, "B - onCreate")
         setContentView(R.layout.activity_floating_ball_demo)
 
         val floatingBall = findViewById<FloatingBallLayout>(R.id.floatingBall)
@@ -31,5 +33,25 @@ class FloatingBallDemoActivity : ComponentActivity() {
             showFloatingBall.visibility = View.GONE
         }
         showFloatingBall.visibility = View.GONE
+    }
+
+    override fun onStart() {
+        super.onStart()
+        Log.e(RecruitmentMainActivity.TAG, "B - onStart")
+    }
+
+    override fun onPause() {
+        super.onPause()
+        Log.e(RecruitmentMainActivity.TAG, "B - onPause")
+    }
+
+    override fun onStop() {
+        super.onStop()
+        Log.e(RecruitmentMainActivity.TAG, "B - onStop")
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        Log.e(RecruitmentMainActivity.TAG, "B - onDestroy")
     }
 }

@@ -1,5 +1,10 @@
 package com.example.hybriddemo
 
+import android.content.Intent
+import android.content.pm.ShortcutInfo
+import android.content.pm.ShortcutManager
+import android.graphics.drawable.Icon
+import android.os.Build
 import android.os.Bundle
 import android.os.SystemClock
 import android.util.Log
@@ -16,8 +21,10 @@ import com.example.flutterbiz.api.IFlutterRouterService
 import com.example.flutterbiz.api.ServiceLocator
 import com.example.flutterbiz.bridge.EventApiCaller
 import com.example.hybriddemo.databinding.ActivityMainBinding
+import com.example.hybriddemo.launch.LaunchThreadPoolFactory
 import com.example.hybriddemo.router.DemoRouterPaths
 import com.example.hybriddemo.sf.CalculateUtils
+import com.example.hybriddemo.thread.PriorityTask
 import com.example.recruit.api.IRecruitRouterService
 import com.example.recruit.api.RecruitRouterApiPaths
 import com.example.resume.api.IResumeRouterService
@@ -39,6 +46,10 @@ import org.jetbrains.annotations.ApiStatus.NonExtendable
 @Route(path = DemoRouterPaths.MAIN)
 class MainActivity : AppCompatActivity() {
 
+    companion object {
+        const val SHORT_START = "short_start"
+    }
+
     private lateinit var binding: ActivityMainBinding
     private val demoRouter: IDemoRouterService?
         get() = RouterApi.getByPath(
@@ -52,6 +63,8 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
         showAppVersion()
         reportColdStartupAfterFirstFrame()
+        initShortStart()
+        entrySource()
 
         binding.btnOpenHome.setOnClickListener {
             // 主引擎打开首页：useMainEngine = true。
@@ -157,11 +170,25 @@ class MainActivity : AppCompatActivity() {
         }
 
         binding.btnResume.setOnClickListener {
-            RouterApi.getByPath(
-                ResumeRouterApiPaths.RESUME_ROUTER_SERVICE,
-                IResumeRouterService::class.java
-            )?.open(this)
+//            RouterApi.getByPath(
+//                ResumeRouterApiPaths.RESUME_ROUTER_SERVICE,
+//                IResumeRouterService::class.java
+//            )?.open(this)
+            submitResult()
         }
+    }
+
+    private fun submitResult(){
+        LaunchThreadPoolFactory.submit(PriorityTask(1){
+            Log.e("LaunchThreadPoolFactory","任务1")
+        })
+
+        LaunchThreadPoolFactory.submit(PriorityTask(10){
+            Log.e("LaunchThreadPoolFactory","任务10")
+        })
+        LaunchThreadPoolFactory.submit(PriorityTask(2){
+            Log.e("LaunchThreadPoolFactory","任务 2")
+        })
     }
 
     private fun showAppVersion() {
@@ -192,5 +219,40 @@ class MainActivity : AppCompatActivity() {
 
     inline fun runBlock(crossinline block: () -> Unit) {
         block()
+    }
+
+    private fun initShortStart() {
+        LaunchThreadPoolFactory.submit {
+            registerShortcuts()
+        }
+    }
+
+    private fun registerShortcuts() {
+        val list = mutableListOf<ShortcutInfo>()
+
+        val shortManager = getSystemService(ShortcutManager::class.java)
+        list.add(
+            ShortcutInfo.Builder(
+                this,
+                "job_id1"
+            ).setShortLabel("找工作").setLongLabel("找工作")
+                .setIcon(Icon.createWithResource(this, R.drawable.icon_short_start))
+                .setIntent(Intent(this, MainActivity::class.java).apply {
+                    flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                    action = Intent.ACTION_VIEW
+                    putExtra(SHORT_START, "1234")
+                })
+                .build()
+        )
+        shortManager.dynamicShortcuts = list
+    }
+
+    private fun entrySource() {
+        if (intent?.getStringExtra(SHORT_START)?.isNotBlank() == true) {
+            RouterApi.getByPath(
+                "/recruit_api/service/recruit-router",
+                IRecruitRouterService::class.java,
+            )?.open(this)
+        }
     }
 }

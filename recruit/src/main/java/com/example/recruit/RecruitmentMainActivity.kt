@@ -1,6 +1,7 @@
 package com.example.recruit
 
 import android.os.Bundle
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -28,6 +29,10 @@ import com.example.recruit.ui.theme.FlutterHybridDemoTheme
 
 @Route(path = RecruitRouterApiPaths.RECRUIT_MAIN)
 class RecruitmentMainActivity : ComponentActivity() {
+    companion object{
+        const val TAG = "Activity-SM"
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -72,6 +77,31 @@ class RecruitmentMainActivity : ComponentActivity() {
                 }
             }
         }
+    }
+
+    override fun onPause() {
+        super.onPause()
+        Log.e(TAG, "A - onPause")
+    }
+
+    override fun onStop() {
+        super.onStop()
+        Log.e(TAG, "A - onStop")
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        Log.e(TAG, "A - onDestroy")
+    }
+
+    override fun onResume() {
+        super.onResume()
+        Log.e(TAG, "A - onResume")
+    }
+
+    override fun onRestart() {
+        super.onRestart()
+        Log.e(TAG, "A - onRestart")
     }
 }
 

@@ -74,7 +74,7 @@ android {
     defaultConfig {
         applicationId = "com.example.hybriddemo"
         manifestPlaceholders["appLabel"] = "@string/app_name"
-        minSdk = 24
+        minSdk = 25
         targetSdk = 35
         versionCode = appVersionCode
         versionName = appVersionName
