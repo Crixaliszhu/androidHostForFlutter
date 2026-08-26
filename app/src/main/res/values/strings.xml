@@ -3,4 +3,8 @@
     <string name="app_name">FlutterHybridDemo</string>
     <string name="title_activity_xbus_main">XBusMainActivity</string>
     <string name="title_activity_xbus_send">XBusSendActivity</string>
+    <string name="shortcut_recruit_short">找工作</string>
+    <string name="shortcut_recruit_long">打开找工作首页</string>
+    <string name="shortcut_recruit_pinned_short">固定找工作</string>
+    <string name="shortcut_recruit_pinned_long">固定入口：找工作首页</string>
 </resources>

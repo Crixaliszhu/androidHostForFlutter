@@ -4,10 +4,15 @@ import android.content.Intent
 import android.content.pm.ShortcutInfo
 import android.content.pm.ShortcutManager
 import android.graphics.drawable.Icon
+import android.os.Build
 import android.os.Bundle
 import android.os.SystemClock
 import android.util.Log
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.pm.ShortcutInfoCompat
+import androidx.core.content.pm.ShortcutManagerCompat
+import androidx.core.graphics.drawable.IconCompat
 import com.alibaba.android.arouter.facade.annotation.Route
 import com.example.appapi.DemoRouterApiPaths
 import com.example.appapi.IDemoRouterService
@@ -36,6 +41,10 @@ class MainActivity : AppCompatActivity() {
 
     companion object {
         const val SHORT_START = "short_start"
+        private const val SHORTCUT_DYNAMIC_RECRUIT = "dynamic_recruit"
+        private const val SHORTCUT_PINNED_RECRUIT = "pinned_recruit"
+        private const val SHORTCUT_SOURCE_DYNAMIC = "dynamic"
+        private const val SHORTCUT_SOURCE_PINNED = "pinned"
     }
 
     private lateinit var binding: ActivityMainBinding
@@ -163,6 +172,16 @@ class MainActivity : AppCompatActivity() {
                 IResumeRouterService::class.java
             )?.open(this)
         }
+
+        binding.btnPinRecruitShortcut.setOnClickListener {
+            requestPinRecruitShortcut()
+        }
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+        entrySource()
     }
 
     private fun showAppVersion() {
@@ -202,27 +221,50 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun registerShortcuts() {
-        val list = mutableListOf<ShortcutInfo>()
-
         val shortManager = getSystemService(ShortcutManager::class.java)
-        list.add(
-            ShortcutInfo.Builder(
-                this,
-                "job_id1"
-            ).setShortLabel("找工作").setLongLabel("找工作")
-                .setIcon(Icon.createWithResource(this, R.drawable.icon_short_start))
-                .setIntent(Intent(this, MainActivity::class.java).apply {
-                    flags = Intent.FLAG_ACTIVITY_NEW_TASK
-                    action = Intent.ACTION_VIEW
-                    putExtra(SHORT_START, "1234")
-                })
-                .build()
-        )
-        shortManager.dynamicShortcuts = list
+        val shortcut = ShortcutInfoCompat.Builder(this, SHORTCUT_DYNAMIC_RECRUIT)
+            .setShortLabel(getString(R.string.shortcut_recruit_short))
+            .setLongLabel(getString(R.string.shortcut_recruit_long))
+            .setIcon(IconCompat.createWithResource(this, R.drawable.icon_short_start))
+            .setIntent(createRecruitShortcutIntent(SHORTCUT_SOURCE_DYNAMIC))
+            .build()
+        ShortcutManagerCompat.pushDynamicShortcut(this, shortcut)
+    }
+
+    private fun requestPinRecruitShortcut() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+            Toast.makeText(this, "Android 8.0 以下不支持主动固定快捷方式", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        val shortcutManager = getSystemService(ShortcutManager::class.java)
+        if (!ShortcutManagerCompat.isRequestPinShortcutSupported(this)) {
+            Toast.makeText(this, "当前桌面不支持固定快捷方式", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        val shortcut = ShortcutInfoCompat.Builder(this, SHORTCUT_PINNED_RECRUIT)
+            .setShortLabel(getString(R.string.shortcut_recruit_pinned_short))
+            .setLongLabel(getString(R.string.shortcut_recruit_pinned_long))
+            .setIcon(IconCompat.createWithResource(this, R.drawable.icon_short_start))
+            .setIntent(createRecruitShortcutIntent(SHORTCUT_SOURCE_PINNED))
+            .build()
+
+        ShortcutManagerCompat.requestPinShortcut(this, shortcut, null)
+    }
+
+    private fun createRecruitShortcutIntent(source: String): Intent {
+        return Intent(this, MainActivity::class.java).apply {
+            action = Intent.ACTION_VIEW
+            flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
+            putExtra(SHORT_START, source)
+        }
     }
 
     private fun entrySource() {
-        if (intent?.getStringExtra(SHORT_START)?.isNotBlank() == true) {
+        val fromCodeShortcut = intent?.getStringExtra(SHORT_START)?.isNotBlank() == true
+        val fromStaticShortcut = intent?.data?.toString() == "hybriddemo://shortcut/recruit_static"
+        if (fromCodeShortcut || fromStaticShortcut) {
             RouterApi.getByPath(
                 "/recruit_api/service/recruit-router",
                 IRecruitRouterService::class.java,

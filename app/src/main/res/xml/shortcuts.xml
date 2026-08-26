@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shortcuts xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <shortcut
+        android:shortcutId="static_recruit"
+        android:enabled="true"
+        android:icon="@drawable/icon_short_start"
+        android:shortcutShortLabel="@string/shortcut_recruit_short"
+        android:shortcutLongLabel="@string/shortcut_recruit_long">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:data="hybriddemo://shortcut/recruit_static"
+            android:targetClass="com.example.hybriddemo.MainActivity"
+            android:targetPackage="com.example.hybriddemo" />
+    </shortcut>
+
+</shortcuts>
