@@ -1,3 +1,5 @@
+import com.android.build.api.dsl.ApplicationExtension
+import com.android.build.api.dsl.LibraryExtension
 import java.util.Locale
 
 // 顶层 build.gradle.kts。
@@ -11,6 +13,44 @@ plugins {
     id("com.android.library") version "8.6.0" apply false
     id("org.jetbrains.kotlin.android") version "1.9.22" apply false
     id("io.sentry.android.gradle") version "6.16.0" apply false
+}
+
+fun Project.isLocalAndroidHostProject(): Boolean {
+    val rootPath = rootProject.projectDir.toPath().normalize()
+    val projectPath = projectDir.toPath().normalize()
+    return projectPath.startsWith(rootPath)
+}
+
+subprojects {
+    pluginManager.withPlugin("com.android.application") {
+        if (!isLocalAndroidHostProject()) return@withPlugin
+
+        extensions.configure<ApplicationExtension>("android") {
+            lint {
+                abortOnError = true
+                checkDependencies = true
+                checkReleaseBuilds = true
+                htmlReport = true
+                xmlReport = true
+            }
+        }
+        dependencies.add("lintChecks", project(":lint-rules"))
+    }
+
+    pluginManager.withPlugin("com.android.library") {
+        if (!isLocalAndroidHostProject()) return@withPlugin
+
+        extensions.configure<LibraryExtension>("android") {
+            lint {
+                abortOnError = true
+                checkDependencies = true
+                checkReleaseBuilds = true
+                htmlReport = true
+                xmlReport = true
+            }
+        }
+        dependencies.add("lintChecks", project(":lint-rules"))
+    }
 }
 
 tasks.register("createApiModule") {

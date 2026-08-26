@@ -60,6 +60,7 @@ include(":app")
 // 马甲包演示模块：复用主 app 的源码和资源，只替换 applicationId、应用名等外壳配置。
 include(":app_vest")
 include(":app_api")
+include(":lint-rules")
 include(":router")
 include(":flutter_engine")
 include(":flutter_biz")
