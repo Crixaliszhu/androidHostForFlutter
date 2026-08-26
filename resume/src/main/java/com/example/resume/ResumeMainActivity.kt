@@ -34,6 +34,9 @@ class ResumeMainActivity : ComponentActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
+        findViewById<Button>(R.id.btn_resume_back).setOnClickListener {
+            finish()
+        }
         findViewById<Button>(R.id.btn_resume_toast).setOnClickListener {
             Toast.makeText(this, "这是Resume页toast", Toast.LENGTH_SHORT).show()
         }
