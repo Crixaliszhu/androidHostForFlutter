@@ -14,6 +14,7 @@ import androidx.core.content.pm.ShortcutInfoCompat
 import androidx.core.content.pm.ShortcutManagerCompat
 import androidx.core.graphics.drawable.IconCompat
 import com.alibaba.android.arouter.facade.annotation.Route
+import com.alibaba.android.arouter.launcher.ARouter
 import com.example.appapi.DemoRouterApiPaths
 import com.example.appapi.IDemoRouterService
 import com.example.flutterbiz.api.IFlutterRouterService
@@ -91,15 +92,15 @@ class MainActivity : AppCompatActivity() {
         }
 
         binding.btnOpenHistoryDataBinding.setOnClickListener {
-            demoRouter?.openHistoryDataBinding(this)
+            ARouter.getInstance().build(DemoRouterPaths.UI_PATH).navigation(this)
         }
 
         binding.btnOpenHistoryViewBinding.setOnClickListener {
-            demoRouter?.openHistoryViewBinding(this)
+            ARouter.getInstance().build(DemoRouterPaths.PROFILE_PATH).navigation(this)
         }
 
         binding.btnOpenHistoryCompose.setOnClickListener {
-            demoRouter?.openHistoryCompose(this)
+            ARouter.getInstance().build(DemoRouterPaths.SYSTEM_PAGE).navigation(this)
         }
 
         binding.btnOpenFlowCompose.setOnClickListener {
@@ -114,32 +115,12 @@ class MainActivity : AppCompatActivity() {
             demoRouter?.openXBusMain(this)
         }
 
-        binding.btnService.setOnClickListener {
-            demoRouter?.openService(this)
-        }
-
-        binding.btnWorkManager.setOnClickListener {
-            demoRouter?.openWorkManager(this)
-        }
-
         binding.btnPhotoPicker.setOnClickListener {
             demoRouter?.openPhotoPicker(this)
         }
 
         binding.btnCameraDemo.setOnClickListener {
             demoRouter?.openCameraDemo(this)
-        }
-
-        binding.btnServiceMessenger.setOnClickListener {
-            demoRouter?.openIpc(this)
-        }
-
-        binding.btnOpenJankOnEnter.setOnClickListener {
-            demoRouter?.openJankOnEnter(this)
-        }
-
-        binding.btnOpenMemoryLeakDemo.setOnClickListener {
-            demoRouter?.openMemoryLeak(this)
         }
 
         binding.btnOpenJobSearchCollapseDemo.setOnClickListener {
@@ -149,18 +130,6 @@ class MainActivity : AppCompatActivity() {
         binding.btnOpenPathAnimationDemo.setOnClickListener {
             demoRouter?.openPathAnimation(this)
 //            throw NullPointerException()
-        }
-
-        binding.btnOpenSentryDemo.setOnClickListener {
-            demoRouter?.openSentry(this)
-        }
-
-        binding.btnOpenAnrCasesDemo.setOnClickListener {
-            demoRouter?.openAnrCases(this)
-        }
-
-        binding.btnOpenSettings.setOnClickListener {
-            demoRouter?.openSettings(this)
         }
 
         binding.btnRecruit.setOnClickListener {

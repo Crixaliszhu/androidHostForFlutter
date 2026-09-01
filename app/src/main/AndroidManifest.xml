@@ -97,6 +97,9 @@
         <activity android:name=".customview.PathAnimationDemoActivity" />
         <activity android:name="com.example.hybriddemo.ipc.ui.IpcDemoActivity" />
         <activity android:name="com.example.hybriddemo.life.LifecycleMainActivity" />
+        <activity android:name="com.example.hybriddemo.page.UIDemoActivity" />
+        <activity android:name="com.example.hybriddemo.page.ProfileDemoActivity" />
+        <activity android:name="com.example.hybriddemo.page.SystemServiceMainActivity" />
     </application>
 
 </manifest>

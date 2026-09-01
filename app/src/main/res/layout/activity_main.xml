@@ -52,27 +52,28 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
-            android:text="④ DataBinding 版本" />
+            android:text="UI层代码展示" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnOpenHistoryViewBinding"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
-            android:text="⑤ ViewBinding 版本" />
+            android:text="Profile分析示例" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnOpenHistoryCompose"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
-            android:text="⑥ Compose 版本" />
+            android:text="系统服务" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnOpenFlowCompose"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
+            android:visibility="gone"
             android:text="ViewModel + Flow + Compose 示例" />
 
         <com.google.android.material.button.MaterialButton
@@ -87,6 +88,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
+            android:visibility="gone"
             android:text="展示Service" />
 
         <com.google.android.material.button.MaterialButton
@@ -94,6 +96,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
+            android:visibility="gone"
             android:text="展示WorkManager媒体上传" />
 
         <com.google.android.material.button.MaterialButton
@@ -101,6 +104,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
+            android:visibility="gone"
             android:text="展示Photo Picker选图" />
 
         <com.google.android.material.button.MaterialButton
@@ -108,6 +112,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
+            android:visibility="gone"
             android:text="展示Camera2相机开发要点" />
 
         <com.google.android.material.button.MaterialButton
@@ -115,6 +120,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
+            android:visibility="gone"
             android:text="展示进程通讯-Messenger" />
 
         <com.google.android.material.button.MaterialButton
@@ -122,6 +128,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
+            android:visibility="gone"
             android:text="进入页面卡顿示例（主线程反例）" />
 
         <com.google.android.material.button.MaterialButton
@@ -129,6 +136,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
+            android:visibility="gone"
             android:text="Memory Profiler 常见内存占用示例" />
 
         <com.google.android.material.button.MaterialButton
@@ -136,6 +144,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
+            android:visibility="gone"
             android:text="搜索框上滑收起/下滑展开动画 Demo" />
 
         <com.google.android.material.button.MaterialButton
@@ -143,6 +152,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
+            android:visibility="gone"
             android:text="PathMeasure 路径动画 Demo" />
 
         <com.google.android.material.button.MaterialButton
@@ -150,6 +160,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
+            android:visibility="gone"
             android:text="Sentry 卡顿 / ANR / 崩溃分析 Demo" />
 
         <com.google.android.material.button.MaterialButton
@@ -157,6 +168,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
+            android:visibility="gone"
             android:text="ANR 八类场景演示 Demo" />
 
         <com.google.android.material.button.MaterialButton
@@ -164,6 +176,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
+            android:visibility="gone"
             android:text="设置 / quality_monitor 日志导出" />
 
         <TextView
@@ -187,6 +200,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
+            android:visibility="gone"
             android:text="前往找工作首页" />
 
         <com.google.android.material.button.MaterialButton
@@ -194,6 +208,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
+            android:visibility="gone"
             android:text="前往找活首页" />
 
         <com.google.android.material.button.MaterialButton

@@ -21,4 +21,7 @@ object DemoRouterPaths {
     const val ANR_CASES = "/demo/anr/cases"
     const val SETTINGS = "/demo/settings/main"
     const val CAMERA = "/camera/main"
+    const val UI_PATH = "/ui/display"
+    const val PROFILE_PATH = "/profile/display"
+    const val SYSTEM_PAGE = "/sys/service/display"
 }
