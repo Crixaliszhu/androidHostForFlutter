@@ -115,8 +115,8 @@ android {
 
     buildTypes {
         getByName("debug") {
-            isMinifyEnabled = true
-            isShrinkResources = true
+            isMinifyEnabled = false
+            isShrinkResources = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
@@ -251,7 +251,11 @@ sentry {
     // includeProguardMapping 负责把 R8 mapping 作为构建产物交给 Sentry 插件；
     // autoUploadProguardMapping 只有在配置 token 时才上传，避免本地无 token 构建失败。
     includeProguardMapping.set(true)
-    autoUploadProguardMapping.set(sentryAuthToken.isNotBlank())
+    autoUploadProguardMapping.set(
+        sentryAuthToken.isNotBlank() && gradle.startParameter.taskNames.any{
+            it.contains("Release", ignoreCase = true)
+        }
+    )
     // Source Context 会上传源码片段，线上通常关闭，避免源码或敏感业务逻辑暴露到第三方平台。
     includeSourceContext.set(false)
     // 关闭构建插件遥测，不影响 Sentry 崩溃、ANR、性能数据上报。

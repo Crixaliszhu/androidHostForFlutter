@@ -1,5 +1,7 @@
 package com.example.camera
 
+import androidx.annotation.Keep
+
 /**
  * Camera 页面展示用的不可变状态快照。
  *
@@ -13,7 +15,8 @@ package com.example.camera
  * 把这些回调都收敛成一个 data class，可以让 Compose UI 只关心“当前相机状态是什么”，
  * 避免 UI 层直接持有 CameraDevice、CameraCaptureSession 等需要严格释放的对象。
  */
-class CameraUiState(
+@Keep
+data class CameraUiState(
     /** 是否已经获得 android.permission.CAMERA 运行时权限。 */
     val permissionGranted: Boolean = false,
     /** CameraManager 枚举出的 camera id 数量，通常后置/前置各一个，多摄设备可能更多。 */

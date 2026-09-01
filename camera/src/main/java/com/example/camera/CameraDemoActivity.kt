@@ -94,7 +94,7 @@ class CameraDemoActivity : ComponentActivity() {
                             previewView = preview
                             // AndroidView 创建 TextureView 后，Controller 才有可用的预览载体。
                             // 如果权限已经存在，就开始等待 SurfaceTexture 并打开 CameraDevice。
-                            if (uiState.permissionGranted == true) {
+                            if (uiState.permissionGranted) {
                                 cameraController.start(preview)
                             }
                         },
