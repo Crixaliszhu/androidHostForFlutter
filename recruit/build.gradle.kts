@@ -50,4 +50,5 @@ dependencies {
 
     implementation(project(":router"))
     implementation(project(":recruit_api"))
+    implementation(project(":widget"))
 }

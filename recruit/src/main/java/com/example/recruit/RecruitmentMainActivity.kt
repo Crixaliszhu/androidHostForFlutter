@@ -7,11 +7,11 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -26,6 +26,7 @@ import com.alibaba.android.arouter.launcher.ARouter
 import com.example.recruit.api.RecruitRouterApiPaths
 import com.example.recruit.ui.FloatingImageBall
 import com.example.recruit.ui.theme.FlutterHybridDemoTheme
+import com.example.widget.titlebar.YpPageScaffold
 
 @Route(path = RecruitRouterApiPaths.RECRUIT_MAIN)
 class RecruitmentMainActivity : ComponentActivity() {
@@ -39,8 +40,11 @@ class RecruitmentMainActivity : ComponentActivity() {
         setContent {
             FlutterHybridDemoTheme {
                 var showFloatingBall by rememberSaveable { mutableStateOf(true) }
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    androidx.compose.foundation.layout.Box(
+                YpPageScaffold(
+                    title = "招聘主页面",
+                    onBackClick = { finish() },
+                ) { innerPadding ->
+                    Box(
                         modifier = Modifier
                             .fillMaxSize()
                             .padding(innerPadding),
@@ -60,6 +64,7 @@ class RecruitmentMainActivity : ComponentActivity() {
                             ) {
                                 Text("打开 View 浮标演示")
                             }
+                            GreetingPreview()
                         }
                         if (showFloatingBall) {
                             FloatingImageBall(
