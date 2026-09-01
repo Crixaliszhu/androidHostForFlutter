@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--
+        Camera 页面使用 Compose 自绘内容，只需要一个轻量 NoActionBar 宿主主题。
+        这里不用宿主 app 的 Theme.HybridDemo，是为了让 camera 模块可以独立被其它宿主聚合。
+    -->
+    <style name="Theme.CameraDemo" parent="android:style/Theme.Material.Light.NoActionBar">
+        <item name="android:windowLightStatusBar">true</item>
+        <item name="android:navigationBarColor">#F6F7F9</item>
+        <item name="android:windowNoTitle">true</item>
+    </style>
+</resources>

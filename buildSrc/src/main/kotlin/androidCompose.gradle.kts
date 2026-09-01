@@ -1,5 +1,5 @@
 val composeCompileSdk = 35
-val composeMinSdk = 24
+val composeMinSdk = 25
 val composeCompilerVersion = "1.5.8"
 val composeBomVersion = "2024.09.00"
 

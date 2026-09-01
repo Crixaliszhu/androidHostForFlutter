@@ -31,6 +31,7 @@ class DemoRouterServiceImpl : IDemoRouterService {
     override fun openSentry(context: Context) = openPath(context, DemoRouterPaths.SENTRY)
     override fun openAnrCases(context: Context) = openPath(context, DemoRouterPaths.ANR_CASES)
     override fun openSettings(context: Context) = openPath(context, DemoRouterPaths.SETTINGS)
+    override fun openCameraDemo(context: Context) = openPath(context, DemoRouterPaths.CAMERA)
 
     override fun openPath(context: Context, pathOrUri: String, extras: Map<String, Any?>?) {
         build(pathOrUri)

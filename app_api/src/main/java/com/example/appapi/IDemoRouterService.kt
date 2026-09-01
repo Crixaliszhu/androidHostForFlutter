@@ -24,6 +24,7 @@ interface IDemoRouterService : IProvider {
     fun openSentry(context: Context)
     fun openAnrCases(context: Context)
     fun openSettings(context: Context)
+    fun openCameraDemo(context: Context)
 
     fun openPath(context: Context, pathOrUri: String, extras: Map<String, Any?>? = null)
     fun openPathForResult(

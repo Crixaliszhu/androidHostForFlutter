@@ -20,4 +20,5 @@ object DemoRouterPaths {
     const val SENTRY = "/demo/sentry/main"
     const val ANR_CASES = "/demo/anr/cases"
     const val SETTINGS = "/demo/settings/main"
+    const val CAMERA = "/camera/main"
 }

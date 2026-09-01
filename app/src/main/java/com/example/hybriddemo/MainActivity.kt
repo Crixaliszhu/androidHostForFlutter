@@ -126,6 +126,10 @@ class MainActivity : AppCompatActivity() {
             demoRouter?.openPhotoPicker(this)
         }
 
+        binding.btnCameraDemo.setOnClickListener {
+            demoRouter?.openCameraDemo(this)
+        }
+
         binding.btnServiceMessenger.setOnClickListener {
             demoRouter?.openIpc(this)
         }
