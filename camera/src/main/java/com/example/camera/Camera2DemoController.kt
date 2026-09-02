@@ -13,8 +13,11 @@ import android.hardware.camera2.CameraManager
 import android.hardware.camera2.CaptureRequest
 import android.hardware.camera2.CaptureResult
 import android.hardware.camera2.TotalCaptureResult
+import android.hardware.camera2.params.OutputConfiguration
+import android.hardware.camera2.params.SessionConfiguration
 import android.hardware.camera2.params.StreamConfigurationMap
 import android.media.ImageReader
+import android.os.Build
 import android.os.Environment
 import android.os.Handler
 import android.os.HandlerThread
@@ -29,6 +32,7 @@ import java.io.FileOutputStream
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import java.util.concurrent.Executor
 
 /**
  * Camera2 示例控制器。
@@ -397,6 +401,9 @@ class Camera2DemoController(
      * - previewSurface 用于实时预览。
      * - readerSurface 用于 JPEG 拍照。
      *
+     * Android P(API 28) 起推荐使用 SessionConfiguration + OutputConfiguration 创建 Session；
+     * 老的 createCaptureSession(List<Surface>, StateCallback, Handler) 已被标记 deprecated。
+     *
      * 之后无论 repeating request 还是 capture request，addTarget 的 Surface 都必须来自这个列表。
      */
     private fun createPreviewSession() {
@@ -417,31 +424,91 @@ class Camera2DemoController(
             set(CaptureRequest.CONTROL_AE_MODE, CaptureRequest.CONTROL_AE_MODE_ON)
         }
 
-        device.createCaptureSession(
-            listOf(previewSurface, readerSurface),
-            object : CameraCaptureSession.StateCallback() {
-                override fun onConfigured(session: CameraCaptureSession) {
-                    captureSession = session
-                    session.setRepeatingRequest(
-                        previewRequestBuilder?.build() ?: return,
-                        captureCallback,
-                        cameraHandler,
-                    )
-                    updateState { copy(isPreviewing = true, status = "预览 repeating request 已启动") }
-                }
-
-                override fun onConfigureFailed(session: CameraCaptureSession) {
-                    updateState {
-                        copy(
-                            isPreviewing = false,
-                            status = "CaptureSession 配置失败",
-                            lastError = "检查输出 Surface、尺寸和格式是否属于同一个 session",
-                        )
-                    }
-                }
-            },
-            cameraHandler,
+        createCameraCaptureSession(
+            device = device,
+            surfaces = listOf(previewSurface, readerSurface),
+            callback = previewSessionCallback(),
         )
+    }
+
+    /**
+     * 用新 API 创建 CameraCaptureSession。
+     *
+     * 新写法把每个 Surface 包装成 OutputConfiguration，再放进 SessionConfiguration：
+     * - OutputConfiguration：描述一个输出流，比如预览 Surface 或 JPEG ImageReader Surface。
+     * - SessionConfiguration：描述整个 Session 的类型、输出流、回调线程和状态回调。
+     *
+     * minSdk 仍是 24，所以 API 24-27 只能走旧 API；这里把 deprecated fallback 隔离在一个小方法里。
+     */
+    private fun createCameraCaptureSession(
+        device: CameraDevice,
+        surfaces: List<Surface>,
+        callback: CameraCaptureSession.StateCallback,
+    ) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            val outputConfigurations = surfaces.map { surface ->
+                OutputConfiguration(surface)
+            }
+            val sessionConfiguration = SessionConfiguration(
+                SessionConfiguration.SESSION_REGULAR,
+                outputConfigurations,
+                cameraExecutor(),
+                callback,
+            )
+            device.createCaptureSession(sessionConfiguration)
+        } else {
+            createCameraCaptureSessionCompat(device, surfaces, callback)
+        }
+    }
+
+    @Suppress("DEPRECATION")
+    private fun createCameraCaptureSessionCompat(
+        device: CameraDevice,
+        surfaces: List<Surface>,
+        callback: CameraCaptureSession.StateCallback,
+    ) {
+        device.createCaptureSession(surfaces, callback, cameraHandler)
+    }
+
+    /**
+     * SessionConfiguration 要求传 Executor，不再直接传 Handler。
+     *
+     * 这里仍然把回调投递到 cameraHandler 所在线程，保证和 openCamera / request 下发在同一条相机线程上。
+     */
+    private fun cameraExecutor(): Executor {
+        return Executor { command ->
+            val handler = cameraHandler
+            if (handler != null) {
+                handler.post(command)
+            } else {
+                mainHandler.post(command)
+            }
+        }
+    }
+
+    /** 预览 Session 状态回调。抽成方法后，新旧 createCaptureSession 写法可以共用同一套回调逻辑。 */
+    private fun previewSessionCallback(): CameraCaptureSession.StateCallback {
+        return object : CameraCaptureSession.StateCallback() {
+            override fun onConfigured(session: CameraCaptureSession) {
+                captureSession = session
+                session.setRepeatingRequest(
+                    previewRequestBuilder?.build() ?: return,
+                    captureCallback,
+                    cameraHandler,
+                )
+                updateState { copy(isPreviewing = true, status = "预览 repeating request 已启动") }
+            }
+
+            override fun onConfigureFailed(session: CameraCaptureSession) {
+                updateState {
+                    copy(
+                        isPreviewing = false,
+                        status = "CaptureSession 配置失败",
+                        lastError = "检查输出 Surface、尺寸和格式是否属于同一个 session",
+                    )
+                }
+            }
+        }
     }
 
     /**

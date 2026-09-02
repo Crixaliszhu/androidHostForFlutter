@@ -41,7 +41,7 @@ class SystemServiceMainActivity : ComponentActivity() {
                     }
 
                     Button(onClick = {
-                        ARouter.getInstance().build(DemoRouterPaths.PATH_ANIMATION)
+                        ARouter.getInstance().build(DemoRouterPaths.CAMERA)
                             .navigation(this@SystemServiceMainActivity)
                     }) {
                         Text("Camera2相机开发要点")
