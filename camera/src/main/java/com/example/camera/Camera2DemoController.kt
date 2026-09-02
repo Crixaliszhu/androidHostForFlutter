@@ -10,6 +10,7 @@ import android.hardware.camera2.CameraCaptureSession
 import android.hardware.camera2.CameraCharacteristics
 import android.hardware.camera2.CameraDevice
 import android.hardware.camera2.CameraManager
+import android.hardware.camera2.CaptureFailure
 import android.hardware.camera2.CaptureRequest
 import android.hardware.camera2.CaptureResult
 import android.hardware.camera2.TotalCaptureResult
@@ -22,6 +23,7 @@ import android.os.Environment
 import android.os.Handler
 import android.os.HandlerThread
 import android.os.Looper
+import android.util.Log
 import android.util.Size
 import android.view.Surface
 import android.view.TextureView
@@ -82,6 +84,9 @@ class Camera2DemoController(
     // 预览 request builder 会被复用，比如切换 Torch 时只改 FLASH_MODE 再重新 setRepeatingRequest。
     private var previewRequestBuilder: CaptureRequest.Builder? = null
 
+    // 记录预览输出 Surface，拍照闪光状态机需要创建全新的预览 request，避免复用 builder 时残留 FLASH_MODE_OFF。
+    private var previewSurface: Surface? = null
+
     // ImageReader 是拍照输出端。它背后有有限个 buffer，拿到 Image 后必须 close。
     private var imageReader: ImageReader? = null
 
@@ -93,6 +98,18 @@ class Camera2DemoController(
     // Compose 的 AndroidView 创建、Activity.onResume、TextureView 回调可能相互靠得很近。
     // 用 openingCamera 防止重复 openCamera 造成 “camera already opened / in use” 类问题。
     private var openingCamera = false
+
+    private enum class CaptureState {
+        PREVIEW,
+        WAITING_AF_LOCK,
+        WAITING_PRECAPTURE,
+        WAITING_NON_PRECAPTURE,
+        PICTURE_TAKEN,
+    }
+
+    // 拍照闪光不是单个 still request 就能稳定完成，很多设备需要 AF/AE 状态机配合。
+    // 这个状态只驱动“点击拍照后的一次闪光拍照流程”。
+    private var captureState = CaptureState.PREVIEW
 
     /**
      * Activity 权限结果同步到 UI。
@@ -204,31 +221,23 @@ class Camera2DemoController(
     }
 
     /**
-     * 下发单帧 JPEG 拍照请求。
+     * 启动一次带闪光灯策略的拍照流程。
      *
-     * 注意这里没有停掉预览 request。Camera2 支持在同一个 Session 中：
-     * - repeating request 持续输出预览 Surface。
-     * - capture request 临时输出 ImageReader Surface。
+     * 日志里已经看到 still request 的 resultAeState=FLASH_REQUIRED、flashState=READY，
+     * 这说明 HAL 认为“需要闪光”，但直接发 still request 没有触发完整预闪/主闪流程。
      *
-     * 拍照是否需要先做 AF trigger / AE precapture，取决于业务质量要求；本 Demo 保持流程短，
-     * 用连续 AF/AE 展示最小闭环。
+     * 因此这里改成更接近系统相机的流程：
+     * 1. 预览 request 切到 ON_ALWAYS_FLASH，告诉 3A 本次拍照需要强制闪光策略。
+     * 2. 发 AF_TRIGGER_START，等待对焦锁定或得到可继续的 AF 状态。
+     * 3. 发 AE_PRECAPTURE_TRIGGER_START，让 HAL 做预曝光/预闪准备。
+     * 4. 等 AE 进入并离开 PRECAPTURE 后，再发真正的 STILL_CAPTURE。
+     * 5. 拍完取消 trigger 并恢复普通预览。
      */
     fun takePhoto() {
         runCatching {
-            val device = cameraDevice ?: return
-            val reader = imageReader ?: return
-            val session = captureSession ?: return
-
-            val request = device.createCaptureRequest(CameraDevice.TEMPLATE_STILL_CAPTURE).apply {
-                addTarget(reader.surface)
-                set(CaptureRequest.CONTROL_AF_MODE, CaptureRequest.CONTROL_AF_MODE_CONTINUOUS_PICTURE)
-                set(CaptureRequest.CONTROL_AE_MODE, CaptureRequest.CONTROL_AE_MODE_ON)
-                set(CaptureRequest.JPEG_ORIENTATION, jpegOrientation())
-            }.build()
-
-            updateState { copy(status = "拍照请求已下发，等待 ImageReader 回调") }
-            session.capture(request, captureCallback, cameraHandler)
+            startFlashCaptureSequence()
         }.onFailure { throwable ->
+            Log.e(TAG, "takePhoto failed", throwable)
             updateState {
                 copy(
                     status = "拍照失败",
@@ -299,20 +308,61 @@ class Camera2DemoController(
      * 这里每隔若干帧读取一次 AF/AE/AWB，既能观察 3A 状态，又避免每一帧都触发 Compose 重组。
      */
     private val captureCallback = object : CameraCaptureSession.CaptureCallback() {
+        override fun onCaptureStarted(
+            session: CameraCaptureSession,
+            request: CaptureRequest,
+            timestamp: Long,
+            frameNumber: Long,
+        ) {
+//            if (isStillFlashRequest(request)) {
+//                Log.e(
+//                    TAG,
+//                    "onCaptureStarted frame=$frameNumber timestamp=$timestamp " +
+//                        "aeMode=${aeModeLabel(request.get(CaptureRequest.CONTROL_AE_MODE))}, " +
+//                        "flashMode=${flashModeLabel(request.get(CaptureRequest.FLASH_MODE))}",
+//                )
+//            }
+        }
+
         override fun onCaptureCompleted(
             session: CameraCaptureSession,
             request: CaptureRequest,
             result: TotalCaptureResult,
         ) {
-            if (result.frameNumber % RESULT_UPDATE_INTERVAL != 0L) return
-            updateState {
-                copy(
-                    frameNumber = result.frameNumber,
-                    afState = afStateLabel(result.get(CaptureResult.CONTROL_AF_STATE)),
-                    aeState = aeStateLabel(result.get(CaptureResult.CONTROL_AE_STATE)),
-                    awbState = awbStateLabel(result.get(CaptureResult.CONTROL_AWB_STATE)),
-                )
+            val shouldUpdateUi = result.frameNumber % RESULT_UPDATE_INTERVAL == 0L
+//            val shouldLog = shouldUpdateUi || isStillFlashRequest(request) || isFlashResultInteresting(result)
+//            if (shouldLog) {
+//                logCaptureResult("onCaptureCompleted", request, result)
+//            }
+            runCatching {
+                processCaptureState(request, result)
+            }.onFailure { throwable ->
+                Log.e(TAG, "processCaptureState failed", throwable)
+                captureState = CaptureState.PREVIEW
             }
+            if (shouldUpdateUi) {
+                updateState {
+                    copy(
+                        frameNumber = result.frameNumber,
+                        afState = afStateLabel(result.get(CaptureResult.CONTROL_AF_STATE)),
+                        aeState = aeStateLabel(result.get(CaptureResult.CONTROL_AE_STATE)),
+                        awbState = awbStateLabel(result.get(CaptureResult.CONTROL_AWB_STATE)),
+                    )
+                }
+            }
+        }
+
+        override fun onCaptureFailed(
+            session: CameraCaptureSession,
+            request: CaptureRequest,
+            failure: CaptureFailure,
+        ) {
+//            Log.e(
+//                TAG,
+//                "onCaptureFailed frame=${failure.frameNumber}, reason=${failure.reason}, " +
+//                    "wasImageCaptured=${failure.wasImageCaptured()}, sequenceId=${failure.sequenceId}",
+//            )
+//            logRequest("failed request", request)
         }
     }
 
@@ -341,11 +391,28 @@ class Camera2DemoController(
                 updateState { copy(lastError = "摄像头没有 StreamConfigurationMap") }
                 return
             }
+
+//            val flashAvailable = characteristics.get(
+//                CameraCharacteristics.FLASH_INFO_AVAILABLE
+//            ) == true
+//
+//            val aeModes = characteristics.get(
+//                CameraCharacteristics.CONTROL_AE_AVAILABLE_MODES
+//            )
+
             val previewSize = choosePreviewSize(map, viewWidth, viewHeight)
             val captureSize = chooseCaptureSize(map)
             val facing = characteristics.get(CameraCharacteristics.LENS_FACING) ?: preferredFacing
             sensorOrientation = characteristics.get(CameraCharacteristics.SENSOR_ORIENTATION) ?: 0
             activeCameraId = cameraId
+//            logCameraCharacteristics(
+//                cameraId = cameraId,
+//                characteristics = characteristics,
+//                flashAvailable = flashAvailable,
+//                aeModes = aeModes,
+//                previewSize = previewSize,
+//                captureSize = captureSize,
+//            )
 
             // 每次切换 cameraId 都重新创建 ImageReader。
             // ImageReader 的尺寸/格式必须参与当前 Session 的 stream 配置，不能在 Session 外临时乱加 target。
@@ -382,6 +449,7 @@ class Camera2DemoController(
             }
             cameraManager.openCamera(cameraId, deviceCallback, cameraHandler)
         }.onFailure { throwable ->
+            Log.e(TAG, "openCamera failed", throwable)
             openingCamera = false
             closeCamera()
             updateState {
@@ -412,21 +480,24 @@ class Camera2DemoController(
         val texture = preview.surfaceTexture ?: return
         val size = state.previewSize.toSizeOrNull() ?: return
         texture.setDefaultBufferSize(size.width, size.height)
-        val previewSurface = Surface(texture)
+        val surface = Surface(texture)
+        previewSurface = surface
         val readerSurface = imageReader?.surface ?: return
         val device = cameraDevice ?: return
 
         // TEMPLATE_PREVIEW 是系统为预览场景提供的一组默认参数。
         // 这里显式打开连续 AF/AE，方便在页面上观察 3A result metadata。
-        previewRequestBuilder = device.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW).apply {
-            addTarget(previewSurface)
-            set(CaptureRequest.CONTROL_AF_MODE, CaptureRequest.CONTROL_AF_MODE_CONTINUOUS_PICTURE)
-            set(CaptureRequest.CONTROL_AE_MODE, CaptureRequest.CONTROL_AE_MODE_ON)
+        previewRequestBuilder = createPreviewRequestBuilder(
+            aeMode = CaptureRequest.CONTROL_AE_MODE_ON,
+            requestTag = REQUEST_TAG_PREVIEW,
+        )
+        previewRequestBuilder?.build()?.let { request ->
+//            logRequest("preview repeating request", request)
         }
 
         createCameraCaptureSession(
             device = device,
-            surfaces = listOf(previewSurface, readerSurface),
+            surfaces = listOf(surface, readerSurface),
             callback = previewSessionCallback(),
         )
     }
@@ -512,6 +583,197 @@ class Camera2DemoController(
     }
 
     /**
+     * 第一步：进入闪光拍照流程并触发 AF。
+     *
+     * 先把 repeating request 切到 ON_ALWAYS_FLASH，是为了让后续 3A result 属于“闪光拍照语境”；
+     * 否则点击拍照后队列里还会回调一些普通预览 result，容易误判 AE/AF 状态。
+     */
+    private fun startFlashCaptureSequence() {
+        val session = captureSession ?: return
+        val builder = createPreviewRequestBuilder(
+            aeMode = CaptureRequest.CONTROL_AE_MODE_ON_ALWAYS_FLASH,
+            requestTag = REQUEST_TAG_PREVIEW_FLASH,
+        ) ?: return
+
+        captureState = CaptureState.WAITING_AF_LOCK
+        builder.set(CaptureRequest.CONTROL_AF_TRIGGER, CaptureRequest.CONTROL_AF_TRIGGER_IDLE)
+        builder.set(CaptureRequest.CONTROL_AE_PRECAPTURE_TRIGGER, CaptureRequest.CONTROL_AE_PRECAPTURE_TRIGGER_IDLE)
+        session.setRepeatingRequest(builder.build(), captureCallback, cameraHandler)
+
+        builder.set(CaptureRequest.CONTROL_AF_TRIGGER, CaptureRequest.CONTROL_AF_TRIGGER_START)
+        builder.setTag(REQUEST_TAG_AF_LOCK)
+        val request = builder.build()
+//        logRequest("AF lock request", request)
+        updateState { copy(status = "正在锁焦，准备触发 AE 预闪") }
+        session.capture(request, captureCallback, cameraHandler)
+
+        builder.set(CaptureRequest.CONTROL_AF_TRIGGER, CaptureRequest.CONTROL_AF_TRIGGER_IDLE)
+        builder.setTag(REQUEST_TAG_PREVIEW_FLASH)
+        previewRequestBuilder = builder
+    }
+
+    /** 根据 AF/AE result 推进闪光拍照状态机。 */
+    private fun processCaptureState(request: CaptureRequest, result: TotalCaptureResult) {
+        when (captureState) {
+            CaptureState.PREVIEW, CaptureState.PICTURE_TAKEN -> Unit
+
+            CaptureState.WAITING_AF_LOCK -> {
+                if (request.tag != REQUEST_TAG_AF_LOCK) return
+                val afState = result.get(CaptureResult.CONTROL_AF_STATE)
+                if (isAfReadyForCapture(afState)) {
+                    Log.e(TAG, "AF ready: frame=${result.frameNumber}, afState=${afStateLabel(afState)}")
+                    runPrecaptureSequence()
+                }
+            }
+
+            CaptureState.WAITING_PRECAPTURE -> {
+                if (request.tag != REQUEST_TAG_AE_PRECAPTURE) return
+                val aeState = result.get(CaptureResult.CONTROL_AE_STATE)
+                if (aeState == CaptureResult.CONTROL_AE_STATE_PRECAPTURE ||
+                    aeState == CaptureResult.CONTROL_AE_STATE_FLASH_REQUIRED
+                ) {
+                    captureState = CaptureState.WAITING_NON_PRECAPTURE
+                    Log.e(TAG, "AE precapture started: frame=${result.frameNumber}, aeState=${aeStateLabel(aeState)}")
+                } else if (aeState == null || aeState == CaptureResult.CONTROL_AE_STATE_CONVERGED) {
+                    Log.e(TAG, "AE precapture skipped by HAL: frame=${result.frameNumber}, aeState=${aeStateLabel(aeState)}")
+                    captureStillPicture()
+                }
+            }
+
+            CaptureState.WAITING_NON_PRECAPTURE -> {
+                if (!isFlashSequenceRequest(request)) return
+                val aeState = result.get(CaptureResult.CONTROL_AE_STATE)
+                if (aeState == null || aeState != CaptureResult.CONTROL_AE_STATE_PRECAPTURE) {
+                    Log.e(TAG, "AE precapture finished: frame=${result.frameNumber}, aeState=${aeStateLabel(aeState)}")
+                    captureStillPicture()
+                }
+            }
+        }
+    }
+
+    /** 第二步：触发 AE precapture，让 HAL 有机会执行预曝光/预闪准备。 */
+    private fun runPrecaptureSequence() {
+        val session = captureSession ?: return
+        val builder = createPreviewRequestBuilder(
+            aeMode = CaptureRequest.CONTROL_AE_MODE_ON_ALWAYS_FLASH,
+            requestTag = REQUEST_TAG_AE_PRECAPTURE,
+        ) ?: return
+
+        captureState = CaptureState.WAITING_PRECAPTURE
+        builder.set(CaptureRequest.CONTROL_AE_PRECAPTURE_TRIGGER, CaptureRequest.CONTROL_AE_PRECAPTURE_TRIGGER_START)
+
+        val request = builder.build()
+//        logRequest("AE precapture request", request)
+        updateState { copy(status = "正在执行 AE 预曝光/预闪") }
+        session.capture(request, captureCallback, cameraHandler)
+
+        builder.set(CaptureRequest.CONTROL_AE_PRECAPTURE_TRIGGER, CaptureRequest.CONTROL_AE_PRECAPTURE_TRIGGER_IDLE)
+        builder.setTag(REQUEST_TAG_PREVIEW_FLASH)
+        previewRequestBuilder = builder
+    }
+
+    /** 第三步：AE 准备完成后下发真正的 JPEG still capture。 */
+    private fun captureStillPicture() {
+        if (captureState == CaptureState.PICTURE_TAKEN) return
+
+        val device = cameraDevice ?: return
+        val reader = imageReader ?: return
+        val session = captureSession ?: return
+
+        captureState = CaptureState.PICTURE_TAKEN
+        val request = device.createCaptureRequest(CameraDevice.TEMPLATE_STILL_CAPTURE).apply {
+            addTarget(reader.surface)
+            set(CaptureRequest.CONTROL_MODE, CaptureRequest.CONTROL_MODE_AUTO)
+            set(CaptureRequest.CONTROL_AF_MODE, CaptureRequest.CONTROL_AF_MODE_CONTINUOUS_PICTURE)
+            set(CaptureRequest.CONTROL_AE_MODE, CaptureRequest.CONTROL_AE_MODE_ON_ALWAYS_FLASH)
+            set(CaptureRequest.JPEG_ORIENTATION, jpegOrientation())
+            setTag(REQUEST_TAG_STILL)
+        }.build()
+
+//        logRequest("still capture request", request)
+        updateState { copy(status = "AE 预闪完成，正在拍照") }
+        session.stopRepeating()
+        session.abortCaptures()
+        session.capture(
+            request,
+            object : CameraCaptureSession.CaptureCallback() {
+                override fun onCaptureStarted(
+                    session: CameraCaptureSession,
+                    request: CaptureRequest,
+                    timestamp: Long,
+                    frameNumber: Long,
+                ) {
+                    Log.e(TAG, "still onCaptureStarted frame=$frameNumber timestamp=$timestamp")
+//                    logRequest("still started request", request)
+                }
+
+                override fun onCaptureCompleted(
+                    session: CameraCaptureSession,
+                    request: CaptureRequest,
+                    result: TotalCaptureResult,
+                ) {
+//                    logCaptureResult("still onCaptureCompleted", request, result)
+                    resumePreviewAfterCapture()
+                }
+
+                override fun onCaptureFailed(
+                    session: CameraCaptureSession,
+                    request: CaptureRequest,
+                    failure: CaptureFailure,
+                ) {
+                    Log.e(
+                        TAG,
+                        "still onCaptureFailed frame=${failure.frameNumber}, reason=${failure.reason}, " +
+                            "wasImageCaptured=${failure.wasImageCaptured()}, sequenceId=${failure.sequenceId}",
+                    )
+//                    logRequest("still failed request", request)
+                    resumePreviewAfterCapture()
+                }
+            },
+            cameraHandler,
+        )
+    }
+
+    /** 第四步：拍照结束后取消 trigger，恢复普通 AE 预览。 */
+    private fun resumePreviewAfterCapture() {
+        val session = captureSession ?: return
+        val unlockBuilder = createPreviewRequestBuilder(
+            aeMode = CaptureRequest.CONTROL_AE_MODE_ON,
+            requestTag = REQUEST_TAG_UNLOCK,
+        ) ?: return
+
+        unlockBuilder.set(CaptureRequest.CONTROL_AF_TRIGGER, CaptureRequest.CONTROL_AF_TRIGGER_CANCEL)
+        unlockBuilder.set(CaptureRequest.CONTROL_AE_PRECAPTURE_TRIGGER, CaptureRequest.CONTROL_AE_PRECAPTURE_TRIGGER_CANCEL)
+        session.capture(unlockBuilder.build(), captureCallback, cameraHandler)
+
+        val previewBuilder = createPreviewRequestBuilder(
+            aeMode = CaptureRequest.CONTROL_AE_MODE_ON,
+            requestTag = REQUEST_TAG_PREVIEW,
+        ) ?: return
+        previewBuilder.set(CaptureRequest.CONTROL_AF_TRIGGER, CaptureRequest.CONTROL_AF_TRIGGER_IDLE)
+        previewBuilder.set(CaptureRequest.CONTROL_AE_PRECAPTURE_TRIGGER, CaptureRequest.CONTROL_AE_PRECAPTURE_TRIGGER_IDLE)
+        session.setRepeatingRequest(previewBuilder.build(), captureCallback, cameraHandler)
+        previewRequestBuilder = previewBuilder
+        captureState = CaptureState.PREVIEW
+        updateState { copy(status = "拍照完成，已恢复预览") }
+    }
+
+    /** 创建干净的预览 request builder，不携带 Torch 开关留下的 FLASH_MODE_OFF/TORCH。 */
+    private fun createPreviewRequestBuilder(
+        aeMode: Int,
+        requestTag: String,
+    ): CaptureRequest.Builder? {
+        val device = cameraDevice ?: return null
+        val surface = previewSurface ?: return null
+        return device.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW).apply {
+            addTarget(surface)
+            set(CaptureRequest.CONTROL_AF_MODE, CaptureRequest.CONTROL_AF_MODE_CONTINUOUS_PICTURE)
+            set(CaptureRequest.CONTROL_AE_MODE, aeMode)
+            setTag(requestTag)
+        }
+    }
+
+    /**
      * 消费 ImageReader 中的 JPEG buffer。
      *
      * 关键点是 finally 中的 image.close()：
@@ -522,6 +784,7 @@ class Camera2DemoController(
         val image = reader.acquireNextImage() ?: return
         val file = nextPhotoFile()
         try {
+            Log.e(TAG, "ImageReader image available: format=${image.format}, size=${image.width}x${image.height}")
             val buffer = image.planes.first().buffer
             val bytes = ByteArray(buffer.remaining())
             buffer.get(bytes)
@@ -533,7 +796,9 @@ class Camera2DemoController(
                     lastError = null,
                 )
             }
+            Log.e(TAG, "JPEG saved: ${file.absolutePath}, bytes=${bytes.size}")
         } catch (throwable: Throwable) {
+            Log.e(TAG, "saveJpeg failed", throwable)
             updateState {
                 copy(
                     status = "保存 JPEG 失败",
@@ -560,6 +825,8 @@ class Camera2DemoController(
         imageReader?.close()
         imageReader = null
         previewRequestBuilder = null
+        previewSurface?.release()
+        previewSurface = null
     }
 
     /** 创建相机专用线程。 */
@@ -743,6 +1010,176 @@ class Camera2DemoController(
         }.orEmpty()
     }
 
+    /**
+     * 打印静态能力。
+     *
+     * 这组日志回答“硬件/Camera HAL 是否宣称支持闪光灯”：
+     * - FLASH_INFO_AVAILABLE 必须为 true。
+     * - CONTROL_AE_AVAILABLE_MODES 里要包含 ON_ALWAYS_FLASH。
+     * 如果这两项都满足，但拍照 still result 没有 FLASH_STATE_FIRED，就继续看 result 状态机日志。
+     */
+    private fun logCameraCharacteristics(
+        cameraId: String,
+        characteristics: CameraCharacteristics,
+        flashAvailable: Boolean,
+        aeModes: IntArray?,
+        previewSize: Size,
+        captureSize: Size,
+    ) {
+        val supportAlwaysFlash = aeModes?.contains(CaptureRequest.CONTROL_AE_MODE_ON_ALWAYS_FLASH) == true
+        val supportAutoFlash = aeModes?.contains(CaptureRequest.CONTROL_AE_MODE_ON_AUTO_FLASH) == true
+        Log.e(
+            TAG,
+            "characteristics: cameraId=$cameraId, " +
+                "lensFacing=${lensFacingLabel(characteristics.get(CameraCharacteristics.LENS_FACING) ?: -1)}, " +
+                "hardwareLevel=${hardwareLevelLabel(characteristics.get(CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL))}, " +
+                "sensorOrientation=${characteristics.get(CameraCharacteristics.SENSOR_ORIENTATION)}, " +
+                "flashAvailable=$flashAvailable, " +
+                "supportAlwaysFlash=$supportAlwaysFlash, supportAutoFlash=$supportAutoFlash, " +
+                "aeModes=${aeModes?.joinToString(prefix = "[", postfix = "]") { aeModeLabel(it) }}, " +
+                "previewSize=${previewSize.format()}, captureSize=${captureSize.format()}, " +
+                "capabilities=${capabilityLabels(characteristics.get(CameraCharacteristics.REQUEST_AVAILABLE_CAPABILITIES))}",
+        )
+    }
+
+    /** 打印 request 里和闪光灯最相关的控制项。 */
+    private fun logRequest(label: String, request: CaptureRequest) {
+        Log.e(
+            TAG,
+            "$label: " +
+                "tag=${request.tag}, " +
+                "aeMode=${aeModeLabel(request.get(CaptureRequest.CONTROL_AE_MODE))}, " +
+                "afMode=${afModeLabel(request.get(CaptureRequest.CONTROL_AF_MODE))}, " +
+                "flashMode=${flashModeLabel(request.get(CaptureRequest.FLASH_MODE))}, " +
+                "aePrecaptureTrigger=${aePrecaptureTriggerLabel(request.get(CaptureRequest.CONTROL_AE_PRECAPTURE_TRIGGER))}, " +
+                "afTrigger=${afTriggerLabel(request.get(CaptureRequest.CONTROL_AF_TRIGGER))}, " +
+                "jpegOrientation=${request.get(CaptureRequest.JPEG_ORIENTATION)}",
+        )
+    }
+
+    /** 打印 result 里的 3A 和 Flash 状态，用于判断 HAL 是否真的 fire。 */
+    private fun logCaptureResult(
+        label: String,
+        request: CaptureRequest,
+        result: TotalCaptureResult,
+    ) {
+        Log.e(
+            TAG,
+            "$label: frame=${result.frameNumber}, " +
+                "requestTag=${request.tag}, " +
+                "requestAeMode=${aeModeLabel(request.get(CaptureRequest.CONTROL_AE_MODE))}, " +
+                "requestFlashMode=${flashModeLabel(request.get(CaptureRequest.FLASH_MODE))}, " +
+                "resultAeState=${aeStateLabel(result.get(CaptureResult.CONTROL_AE_STATE))}, " +
+                "resultAfState=${afStateLabel(result.get(CaptureResult.CONTROL_AF_STATE))}, " +
+                "resultAwbState=${awbStateLabel(result.get(CaptureResult.CONTROL_AWB_STATE))}, " +
+                "flashState=${flashStateLabel(result.get(CaptureResult.FLASH_STATE))}",
+        )
+    }
+
+    /** still request 或强制/自动闪光 request 都要重点记录。 */
+    private fun isStillFlashRequest(request: CaptureRequest): Boolean {
+        val aeMode = request.get(CaptureRequest.CONTROL_AE_MODE)
+        val flashMode = request.get(CaptureRequest.FLASH_MODE)
+        return aeMode == CaptureRequest.CONTROL_AE_MODE_ON_ALWAYS_FLASH ||
+            aeMode == CaptureRequest.CONTROL_AE_MODE_ON_AUTO_FLASH ||
+            flashMode == CaptureRequest.FLASH_MODE_SINGLE ||
+            flashMode == CaptureRequest.FLASH_MODE_TORCH
+    }
+
+    /** 这些 result 表示闪光灯状态机出现了关键变化，不能等 30 帧采样。 */
+    private fun isFlashResultInteresting(result: TotalCaptureResult): Boolean {
+        val aeState = result.get(CaptureResult.CONTROL_AE_STATE)
+        val flashState = result.get(CaptureResult.FLASH_STATE)
+        return aeState == CaptureResult.CONTROL_AE_STATE_FLASH_REQUIRED ||
+                aeState == CaptureResult.CONTROL_AE_STATE_PRECAPTURE ||
+                flashState == CaptureResult.FLASH_STATE_CHARGING ||
+                flashState == CaptureResult.FLASH_STATE_READY ||
+                flashState == CaptureResult.FLASH_STATE_FIRED ||
+                flashState == CaptureResult.FLASH_STATE_PARTIAL
+    }
+
+    /** 判断 result 是否属于本次闪光拍照状态机，过滤队列里尚未消费完的普通预览帧。 */
+    private fun isFlashSequenceRequest(request: CaptureRequest): Boolean {
+        return when (request.tag) {
+            REQUEST_TAG_PREVIEW_FLASH,
+            REQUEST_TAG_AF_LOCK,
+            REQUEST_TAG_AE_PRECAPTURE,
+            REQUEST_TAG_STILL -> true
+            else -> false
+        }
+    }
+
+    /** 连续对焦模式下，不同 HAL 返回的 AF 状态略有差异；这些状态都可以继续 AE precapture。 */
+    private fun isAfReadyForCapture(state: Int?): Boolean {
+        return state == null ||
+            state == CaptureResult.CONTROL_AF_STATE_FOCUSED_LOCKED ||
+            state == CaptureResult.CONTROL_AF_STATE_NOT_FOCUSED_LOCKED ||
+            state == CaptureResult.CONTROL_AF_STATE_PASSIVE_FOCUSED ||
+            state == CaptureResult.CONTROL_AF_STATE_PASSIVE_UNFOCUSED ||
+            state == CaptureResult.CONTROL_AF_STATE_INACTIVE
+    }
+
+    private fun aeModeLabel(mode: Int?): String {
+        return when (mode) {
+            CaptureRequest.CONTROL_AE_MODE_OFF -> "OFF"
+            CaptureRequest.CONTROL_AE_MODE_ON -> "ON"
+            CaptureRequest.CONTROL_AE_MODE_ON_AUTO_FLASH -> "ON_AUTO_FLASH"
+            CaptureRequest.CONTROL_AE_MODE_ON_ALWAYS_FLASH -> "ON_ALWAYS_FLASH"
+            CaptureRequest.CONTROL_AE_MODE_ON_AUTO_FLASH_REDEYE -> "ON_AUTO_FLASH_REDEYE"
+            else -> mode?.let { "AE_MODE_$it" } ?: "-"
+        }
+    }
+
+    private fun afModeLabel(mode: Int?): String {
+        return when (mode) {
+            CaptureRequest.CONTROL_AF_MODE_OFF -> "OFF"
+            CaptureRequest.CONTROL_AF_MODE_AUTO -> "AUTO"
+            CaptureRequest.CONTROL_AF_MODE_MACRO -> "MACRO"
+            CaptureRequest.CONTROL_AF_MODE_CONTINUOUS_VIDEO -> "CONTINUOUS_VIDEO"
+            CaptureRequest.CONTROL_AF_MODE_CONTINUOUS_PICTURE -> "CONTINUOUS_PICTURE"
+            CaptureRequest.CONTROL_AF_MODE_EDOF -> "EDOF"
+            else -> mode?.let { "AF_MODE_$it" } ?: "-"
+        }
+    }
+
+    private fun flashModeLabel(mode: Int?): String {
+        return when (mode) {
+            CaptureRequest.FLASH_MODE_OFF -> "OFF"
+            CaptureRequest.FLASH_MODE_SINGLE -> "SINGLE"
+            CaptureRequest.FLASH_MODE_TORCH -> "TORCH"
+            else -> mode?.let { "FLASH_MODE_$it" } ?: "-"
+        }
+    }
+
+    private fun flashStateLabel(state: Int?): String {
+        return when (state) {
+            CaptureResult.FLASH_STATE_UNAVAILABLE -> "UNAVAILABLE"
+            CaptureResult.FLASH_STATE_CHARGING -> "CHARGING"
+            CaptureResult.FLASH_STATE_READY -> "READY"
+            CaptureResult.FLASH_STATE_FIRED -> "FIRED"
+            CaptureResult.FLASH_STATE_PARTIAL -> "PARTIAL"
+            else -> state?.let { "FLASH_STATE_$it" } ?: "-"
+        }
+    }
+
+    private fun aePrecaptureTriggerLabel(trigger: Int?): String {
+        return when (trigger) {
+            CaptureRequest.CONTROL_AE_PRECAPTURE_TRIGGER_IDLE -> "IDLE"
+            CaptureRequest.CONTROL_AE_PRECAPTURE_TRIGGER_START -> "START"
+            CaptureRequest.CONTROL_AE_PRECAPTURE_TRIGGER_CANCEL -> "CANCEL"
+            else -> trigger?.let { "AE_PRECAPTURE_$it" } ?: "-"
+        }
+    }
+
+    private fun afTriggerLabel(trigger: Int?): String {
+        return when (trigger) {
+            CaptureRequest.CONTROL_AF_TRIGGER_IDLE -> "IDLE"
+            CaptureRequest.CONTROL_AF_TRIGGER_START -> "START"
+            CaptureRequest.CONTROL_AF_TRIGGER_CANCEL -> "CANCEL"
+            else -> trigger?.let { "AF_TRIGGER_$it" } ?: "-"
+        }
+    }
+
     /** 自动对焦状态，常用于判断用户点按对焦或拍照前锁焦是否完成。 */
     private fun afStateLabel(state: Int?): String {
         return when (state) {
@@ -794,6 +1231,13 @@ class Camera2DemoController(
         private const val FULL_ROTATION = 360
         // 每 30 帧更新一次 3A 状态，减少 UI 重组频率。
         private const val RESULT_UPDATE_INTERVAL = 30L
+        private const val TAG = "Camera-2"
+        private const val REQUEST_TAG_PREVIEW = "preview"
+        private const val REQUEST_TAG_PREVIEW_FLASH = "preview_flash"
+        private const val REQUEST_TAG_AF_LOCK = "af_lock"
+        private const val REQUEST_TAG_AE_PRECAPTURE = "ae_precapture"
+        private const val REQUEST_TAG_STILL = "still"
+        private const val REQUEST_TAG_UNLOCK = "unlock"
         private val PHOTO_TIME_FORMAT = SimpleDateFormat("yyyyMMdd-HHmmss", Locale.US)
     }
 }
