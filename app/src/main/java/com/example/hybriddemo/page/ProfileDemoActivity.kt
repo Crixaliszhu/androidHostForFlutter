@@ -6,6 +6,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
@@ -28,54 +29,63 @@ class ProfileDemoActivity : ComponentActivity() {
                 onBackClick = { finish() }
             ) {
                 Column(
-                    modifier = Modifier.fillMaxSize().padding(it),
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(it),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Button(
+                    Button(modifier = Modifier.fillMaxWidth(),
                         onClick = {
-                            ARouter.getInstance().build(DemoRouterPaths.SERVICE).navigation(this@ProfileDemoActivity)
+                            ARouter.getInstance().build(DemoRouterPaths.SERVICE)
+                                .navigation(this@ProfileDemoActivity)
                         }
                     ) {
                         Text("Service展示")
                     }
-                    Button(
+                    Button(modifier = Modifier.fillMaxWidth(),
                         onClick = {
-                            ARouter.getInstance().build(DemoRouterPaths.WORK_MANAGER).navigation(this@ProfileDemoActivity)
+                            ARouter.getInstance().build(DemoRouterPaths.WORK_MANAGER)
+                                .navigation(this@ProfileDemoActivity)
                         }
                     ) {
                         Text("WorkManager 展示")
                     }
-                    Button(
+                    Button(modifier = Modifier.fillMaxWidth(),
                         onClick = {
-                            ARouter.getInstance().build(DemoRouterPaths.JANK_ON_ENTER).navigation(this@ProfileDemoActivity)
+                            ARouter.getInstance().build(DemoRouterPaths.JANK_ON_ENTER)
+                                .navigation(this@ProfileDemoActivity)
                         }
                     ) {
                         Text("进入页面卡顿示例")
                     }
-                    Button(
+                    Button(modifier = Modifier.fillMaxWidth(),
                         onClick = {
-                            ARouter.getInstance().build(DemoRouterPaths.MEMORY_LEAK).navigation(this@ProfileDemoActivity)
+                            ARouter.getInstance().build(DemoRouterPaths.MEMORY_LEAK)
+                                .navigation(this@ProfileDemoActivity)
                         }
                     ) {
                         Text("Memory profile 内存占用示例")
                     }
-                    Button(
+                    Button(modifier = Modifier.fillMaxWidth(),
                         onClick = {
-                            ARouter.getInstance().build(DemoRouterPaths.SENTRY).navigation(this@ProfileDemoActivity)
+                            ARouter.getInstance().build(DemoRouterPaths.SENTRY)
+                                .navigation(this@ProfileDemoActivity)
                         }
                     ) {
                         Text("Sentry分析 示例")
                     }
-                    Button(
+                    Button(modifier = Modifier.fillMaxWidth(),
                         onClick = {
-                            ARouter.getInstance().build(DemoRouterPaths.ANR_CASES).navigation(this@ProfileDemoActivity)
+                            ARouter.getInstance().build(DemoRouterPaths.ANR_CASES)
+                                .navigation(this@ProfileDemoActivity)
                         }
                     ) {
                         Text("八大ANR场景演示")
                     }
-                    Button(
+                    Button(modifier = Modifier.fillMaxWidth(),
                         onClick = {
-                            ARouter.getInstance().build(DemoRouterPaths.SETTINGS).navigation(this@ProfileDemoActivity)
+                            ARouter.getInstance().build(DemoRouterPaths.SETTINGS)
+                                .navigation(this@ProfileDemoActivity)
                         }
                     ) {
                         Text("设置页面")

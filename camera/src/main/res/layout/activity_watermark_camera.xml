@@ -1,0 +1,272 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <data>
+
+        <import type="android.view.View" />
+
+        <variable
+            name="vm"
+            type="com.example.camera.WatermarkCameraUiModel" />
+
+        <variable
+            name="actions"
+            type="com.example.camera.WatermarkCameraActionHandler" />
+    </data>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#000000"
+        android:orientation="vertical">
+
+        <!-- 顶栏只保留返回和页面名，拍摄操作集中在底部，单手操作更顺畅。 -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingHorizontal="8dp">
+
+            <ImageButton
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="?android:attr/selectableItemBackgroundBorderless"
+                android:contentDescription="@string/watermark_back_description"
+                android:onClick="@{() -> actions.onBack()}"
+                android:padding="13dp"
+                android:src="@android:drawable/ic_menu_revert"
+                android:tint="#FFFFFF" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="@string/watermark_camera_title"
+                android:textColor="#FFFFFF"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
+            <View
+                android:layout_width="48dp"
+                android:layout_height="48dp" />
+        </LinearLayout>
+
+        <!-- TextureView 提供 Camera2 Surface；ImageView 在拍照后覆盖它显示待确认成片。 -->
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:background="#111111">
+
+            <TextureView
+                android:id="@+id/cameraPreview"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+
+            <ImageView
+                android:id="@+id/photoPreview"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:contentDescription="@null"
+                android:scaleType="fitCenter"
+                android:visibility="@{vm.reviewing ? View.VISIBLE : View.GONE}" />
+
+            <!-- 实时水印只覆盖取景器；确认页的水印已实际绘制进 photoPreview 位图。 -->
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom|start"
+                android:layout_marginStart="18dp"
+                android:layout_marginBottom="22dp"
+                android:background="@drawable/bg_watermark_label"
+                android:orientation="vertical"
+                android:visibility="@{vm.reviewing ? View.GONE : View.VISIBLE}">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@{vm.timeText}"
+                    android:textColor="#FFFFFF"
+                    android:textSize="24sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="3dp"
+                    android:drawablePadding="5dp"
+                    android:drawableStart="@android:drawable/ic_menu_mylocation"
+                    android:maxLines="2"
+                    android:text="@{vm.locationText}"
+                    android:textColor="#FFFFFF"
+                    android:textSize="14sp" />
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom|end"
+                android:layout_marginEnd="16dp"
+                android:layout_marginBottom="14dp"
+                android:text="@string/watermark_brand"
+                android:textColor="#CCFFFFFF"
+                android:textSize="12sp"
+                android:visibility="@{vm.reviewing ? View.VISIBLE : View.GONE}" />
+
+            <ProgressBar
+                android:layout_width="44dp"
+                android:layout_height="44dp"
+                android:layout_gravity="center"
+                android:indeterminateTint="#B7E86B"
+                android:visibility="@{vm.busy ? View.VISIBLE : View.GONE}" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="top"
+                android:background="#99000000"
+                android:gravity="center"
+                android:padding="8dp"
+                android:text="@{vm.statusText}"
+                android:textColor="#FFFFFF"
+                android:textSize="13sp"
+                android:visibility="@{vm.statusVisible ? View.VISIBLE : View.GONE}" />
+        </FrameLayout>
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="132dp"
+            android:paddingHorizontal="24dp">
+
+            <!-- 拍摄态：定位和快门。 -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:orientation="horizontal"
+                android:visibility="@{vm.reviewing ? View.GONE : View.VISIBLE}">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:onClick="@{() -> actions.onLocate()}"
+                    android:orientation="vertical">
+
+                    <ImageView
+                        android:layout_width="46dp"
+                        android:layout_height="46dp"
+                        android:background="@drawable/bg_watermark_action"
+                        android:contentDescription="@string/watermark_location_description"
+                        android:padding="12dp"
+                        android:src="@android:drawable/ic_menu_mylocation"
+                        android:tint="#FFFFFF" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="5dp"
+                        android:text="@string/watermark_location_action"
+                        android:textColor="#FFFFFF"
+                        android:textSize="13sp" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:orientation="vertical">
+
+                    <ImageButton
+                        android:layout_width="76dp"
+                        android:layout_height="76dp"
+                        android:background="@drawable/bg_watermark_shutter"
+                        android:contentDescription="@string/watermark_capture_description"
+                        android:enabled="@{!vm.busy}"
+                        android:onClick="@{() -> actions.onCapture()}"
+                        android:padding="24dp"
+                        android:src="@android:drawable/ic_menu_camera"
+                        android:tint="#111111" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:text="@string/watermark_capture_action"
+                        android:textColor="#FFFFFF"
+                        android:textSize="13sp" />
+                </LinearLayout>
+
+                <View
+                    android:layout_width="0dp"
+                    android:layout_height="1dp"
+                    android:layout_weight="1" />
+            </LinearLayout>
+
+            <!-- 确认态：关闭表示丢弃，保存表示写入系统相册。 -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:orientation="horizontal"
+                android:visibility="@{vm.reviewing ? View.VISIBLE : View.GONE}">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:onClick="@{() -> actions.onDiscard()}"
+                    android:orientation="vertical">
+
+                    <ImageView
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:background="@drawable/bg_watermark_action"
+                        android:contentDescription="@string/watermark_close_description"
+                        android:padding="12dp"
+                        android:src="@android:drawable/ic_menu_close_clear_cancel"
+                        android:tint="#FFFFFF" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="5dp"
+                        android:text="@string/watermark_close_action"
+                        android:textColor="#FFFFFF"
+                        android:textSize="13sp" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:onClick="@{() -> actions.onSave()}"
+                    android:orientation="vertical">
+
+                    <ImageView
+                        android:layout_width="76dp"
+                        android:layout_height="76dp"
+                        android:background="@drawable/bg_watermark_shutter"
+                        android:contentDescription="@string/watermark_save_description"
+                        android:padding="22dp"
+                        android:src="@android:drawable/ic_menu_save"
+                        android:tint="#111111" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:text="@string/watermark_save_action"
+                        android:textColor="#FFFFFF"
+                        android:textSize="13sp" />
+                </LinearLayout>
+            </LinearLayout>
+        </FrameLayout>
+    </LinearLayout>
+</layout>

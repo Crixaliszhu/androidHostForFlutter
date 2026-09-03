@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="watermark_camera_title">水印相机</string>
+    <string name="watermark_location_default">我在这里</string>
+    <string name="watermark_location_action">定位</string>
+    <string name="watermark_capture_action">拍照</string>
+    <string name="watermark_close_action">关闭</string>
+    <string name="watermark_save_action">保存</string>
+    <string name="watermark_back_description">返回</string>
+    <string name="watermark_location_description">获取当前位置</string>
+    <string name="watermark_capture_description">拍摄照片</string>
+    <string name="watermark_close_description">放弃当前照片</string>
+    <string name="watermark_save_description">保存照片到相册</string>
+    <string name="watermark_brand">水印相机</string>
+</resources>

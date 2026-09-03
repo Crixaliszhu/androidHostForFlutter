@@ -1,6 +1,7 @@
 package com.example.camera
 
 import android.Manifest
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.view.TextureView
@@ -104,6 +105,9 @@ class CameraDemoActivity : ComponentActivity() {
                         onTakePhoto = cameraController::takePhoto,
                         onSwitchCamera = cameraController::switchCamera,
                         onToggleTorch = cameraController::toggleTorch,
+                        onOpenWatermarkCamera = {
+                            startActivity(Intent(this, WatermarkCameraActivity::class.java))
+                        },
                     )
                 }
             }
@@ -139,6 +143,7 @@ private fun CameraDemoScreen(
     onTakePhoto: () -> Unit,
     onSwitchCamera: () -> Unit,
     onToggleTorch: () -> Unit,
+    onOpenWatermarkCamera: () -> Unit,
 ) {
     // 页面整体可滚动，避免小屏手机上预览、控制区和 metadata 信息互相挤压。
     Column(
@@ -169,6 +174,12 @@ private fun CameraDemoScreen(
             onSwitchCamera = onSwitchCamera,
             onToggleTorch = onToggleTorch,
         )
+        OutlinedButton(
+            modifier = Modifier.fillMaxWidth(),
+            onClick = onOpenWatermarkCamera,
+        ) {
+            Text("打开水印相机（DataBinding）")
+        }
         CameraInfoPanel(state = state)
         CameraStepsPanel()
     }

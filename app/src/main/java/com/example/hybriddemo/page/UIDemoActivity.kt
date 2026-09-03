@@ -8,6 +8,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
@@ -40,14 +41,16 @@ class UIDemoActivity : ComponentActivity() {
                         .padding(innerPadding),
                     horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
-                    Button(onClick = {
-                        ARouter.getInstance().build(DemoRouterPaths.HISTORY_DATA_BINDING)
-                            .navigation(this@UIDemoActivity)
-                    }) {
+                    Button(modifier = Modifier.fillMaxWidth(),
+                        onClick = {
+                            ARouter.getInstance().build(DemoRouterPaths.HISTORY_DATA_BINDING)
+                                .navigation(this@UIDemoActivity)
+                        }) {
                         Text("Databinding 版本")
                     }
 
-                    Button(
+                    Button(modifier = Modifier.fillMaxWidth(),
+
                         onClick = {
                             ARouter.getInstance().build(DemoRouterPaths.HISTORY_VIEW_BINDING)
                                 .navigation(this@UIDemoActivity)
@@ -56,49 +59,57 @@ class UIDemoActivity : ComponentActivity() {
                         Text("ViewBinding 版本")
                     }
 
-                    Button(onClick = {
-                        ARouter.getInstance().build(DemoRouterPaths.HISTORY_COMPOSE)
-                            .navigation(this@UIDemoActivity)
-                    }) {
+                    Button(modifier = Modifier.fillMaxWidth(),
+                        onClick = {
+                            ARouter.getInstance().build(DemoRouterPaths.HISTORY_COMPOSE)
+                                .navigation(this@UIDemoActivity)
+                        }) {
                         Text("Compose版本")
                     }
 
-                    Button(onClick = {
-                        ARouter.getInstance().build(DemoRouterPaths.FLOW_COMPOSE)
-                            .navigation(this@UIDemoActivity)
-                    }) {
+                    Button(modifier = Modifier.fillMaxWidth(),
+                        onClick = {
+                            ARouter.getInstance().build(DemoRouterPaths.FLOW_COMPOSE)
+                                .navigation(this@UIDemoActivity)
+                        }) {
                         Text("VM + Flow + Compose")
                     }
 
-                    Button(onClick = {
-                        ARouter.getInstance().build(DemoRouterPaths.JOB_SEARCH_COLLAPSE)
-                            .navigation(this@UIDemoActivity)
-                    }) {
+                    Button(
+                        modifier = Modifier.fillMaxWidth(),
+                        onClick = {
+                            ARouter.getInstance().build(DemoRouterPaths.JOB_SEARCH_COLLAPSE)
+                                .navigation(this@UIDemoActivity)
+                        }) {
                         Text("搜索框滑动动画")
                     }
 
-                    Button(onClick = {
-                        ARouter.getInstance().build(DemoRouterPaths.PATH_ANIMATION)
-                            .navigation(this@UIDemoActivity)
-                    }) {
+                    Button(
+                        modifier = Modifier.fillMaxWidth(),
+                        onClick = {
+                            ARouter.getInstance().build(DemoRouterPaths.PATH_ANIMATION)
+                                .navigation(this@UIDemoActivity)
+                        }) {
                         Text("PathMeasure动画")
                     }
 
-                    Button(onClick = {
-                        RouterApi.getByPath(
-                            RecruitRouterApiPaths.RECRUIT_ROUTER_SERVICE,
-                            IRecruitRouterService::class.java,
-                        )?.open(this@UIDemoActivity)
-                    }) {
+                    Button(modifier = Modifier.fillMaxWidth(),
+                        onClick = {
+                            RouterApi.getByPath(
+                                RecruitRouterApiPaths.RECRUIT_ROUTER_SERVICE,
+                                IRecruitRouterService::class.java,
+                            )?.open(this@UIDemoActivity)
+                        }) {
                         Text("找工作首页")
                     }
 
-                    Button(onClick = {
-                        RouterApi.getByPath(
-                            ResumeRouterApiPaths.RESUME_ROUTER_SERVICE,
-                            IResumeRouterService::class.java
-                        )?.open(this@UIDemoActivity)
-                    }) {
+                    Button(modifier = Modifier.fillMaxWidth(),
+                        onClick = {
+                            RouterApi.getByPath(
+                                ResumeRouterApiPaths.RESUME_ROUTER_SERVICE,
+                                IResumeRouterService::class.java
+                            )?.open(this@UIDemoActivity)
+                        }) {
                         Text("找活首页")
                     }
                 }

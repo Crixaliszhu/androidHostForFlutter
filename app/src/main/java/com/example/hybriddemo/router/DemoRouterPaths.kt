@@ -24,4 +24,5 @@ object DemoRouterPaths {
     const val UI_PATH = "/ui/display"
     const val PROFILE_PATH = "/profile/display"
     const val SYSTEM_PAGE = "/sys/service/display"
+    const val WATER_CAMERA = "/water/camera/display"
 }

@@ -6,6 +6,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
@@ -33,25 +34,44 @@ class SystemServiceMainActivity : ComponentActivity() {
                         .padding(it),
                     horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
-                    Button(onClick = {
-                        ARouter.getInstance().build(DemoRouterPaths.PHOTO_PICKER)
-                            .navigation(this@SystemServiceMainActivity)
-                    }) {
+                    Button(
+                        modifier = Modifier.fillMaxWidth(),
+                        onClick = {
+                            ARouter.getInstance().build(DemoRouterPaths.PHOTO_PICKER)
+                                .navigation(this@SystemServiceMainActivity)
+                        }
+                    ) {
                         Text("展示 Photo Picker选图")
                     }
 
-                    Button(onClick = {
-                        ARouter.getInstance().build(DemoRouterPaths.CAMERA)
-                            .navigation(this@SystemServiceMainActivity)
-                    }) {
+                    Button(
+                        modifier = Modifier.fillMaxWidth(),
+                        onClick = {
+                            ARouter.getInstance().build(DemoRouterPaths.CAMERA)
+                                .navigation(this@SystemServiceMainActivity)
+                        }
+                    ) {
                         Text("Camera2相机开发要点")
                     }
 
-                    Button(onClick = {
-                        ARouter.getInstance().build(DemoRouterPaths.IPC)
-                            .navigation(this@SystemServiceMainActivity)
-                    }) {
+                    Button(
+                        modifier = Modifier.fillMaxWidth(),
+                        onClick = {
+                            ARouter.getInstance().build(DemoRouterPaths.IPC)
+                                .navigation(this@SystemServiceMainActivity)
+                        }
+                    ) {
                         Text("进程通讯-Messenger")
+                    }
+
+                    Button(
+                        modifier = Modifier.fillMaxWidth(),
+                        onClick = {
+                            ARouter.getInstance().build(DemoRouterPaths.WATER_CAMERA)
+                                .navigation(this@SystemServiceMainActivity)
+                        }
+                    ) {
+                        Text("水印相机-Camera")
                     }
                 }
             }

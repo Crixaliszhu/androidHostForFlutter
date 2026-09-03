@@ -9,4 +9,16 @@
         <item name="android:navigationBarColor">#F6F7F9</item>
         <item name="android:windowNoTitle">true</item>
     </style>
+
+    <!-- 水印相机采用沉浸式黑色操作区，固定竖屏以简化 Camera2 方向和水印坐标处理。 -->
+    <style name="Theme.WatermarkCamera" parent="android:style/Theme.Material.Light.NoActionBar">
+        <item name="android:fontFamily">sans</item>
+        <item name="android:windowActionModeOverlay">true</item>
+        <item name="android:windowBackground">#000000</item>
+        <item name="android:statusBarColor">#000000</item>
+        <item name="android:navigationBarColor">#000000</item>
+        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:windowLightNavigationBar">false</item>
+        <item name="android:windowNoTitle">true</item>
+    </style>
 </resources>

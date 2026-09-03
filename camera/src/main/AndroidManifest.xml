@@ -7,6 +7,15 @@
     -->
     <uses-permission android:name="android.permission.CAMERA" />
 
+    <!-- 定位按钮运行时申请这两个权限，再通过 LocationManager 获取一次当前位置。 -->
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+
+    <!-- Android 9 及以下写公共相册需要存储权限；Android 10+ 使用 MediaStore 不再需要。 -->
+    <uses-permission
+        android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+        android:maxSdkVersion="28" />
+
     <!--
         required=false 表示“这个功能会用相机，但安装时不强制设备必须有相机”。
         教学 Demo 更适合这样配置：无相机设备仍可安装，只是在页面里展示不可用状态。
@@ -25,5 +34,11 @@
             android:exported="false"
             android:label="Camera2 开发要点"
             android:theme="@style/Theme.CameraDemo" />
+        <activity
+            android:name=".WatermarkCameraActivity"
+            android:exported="false"
+            android:label="水印相机"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.WatermarkCamera" />
     </application>
 </manifest>

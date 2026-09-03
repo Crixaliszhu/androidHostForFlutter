@@ -28,4 +28,9 @@ android {
             }
         }
     }
+
+    buildFeatures {
+        // 水印相机页面使用 XML DataBinding；原有 Camera2 教学页继续使用 Compose。
+        dataBinding = true
+    }
 }
