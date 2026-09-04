@@ -35,7 +35,7 @@
             android:label="Camera2 开发要点"
             android:theme="@style/Theme.CameraDemo" />
         <activity
-            android:name=".WatermarkCameraActivity"
+            android:name=".water.WatermarkCameraActivity"
             android:exported="false"
             android:label="水印相机"
             android:screenOrientation="portrait"
