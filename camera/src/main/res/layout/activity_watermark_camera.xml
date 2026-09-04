@@ -7,8 +7,8 @@
         <import type="android.view.View" />
 
         <variable
-            name="state"
-            type="com.example.camera.water.entity.WaterCameraUiState" />
+            name="vm"
+            type="com.example.camera.water.vm.WaterCameraViewModel" />
 
         <variable
             name="actions"
@@ -73,8 +73,8 @@
                 android:layout_height="match_parent"
                 android:contentDescription="@null"
                 android:scaleType="fitCenter"
-                bitmap="@{state.previewBitmap}"
-                android:visibility="@{state.reviewing ? View.VISIBLE : View.GONE}" />
+                bitmap="@{vm.uiState.previewBitmap}"
+                android:visibility="@{vm.uiState.reviewing ? View.VISIBLE : View.GONE}" />
 
             <!-- 实时水印只覆盖取景器；确认页的水印已实际绘制进 photoPreview 位图。 -->
             <LinearLayout
@@ -86,12 +86,12 @@
                 android:layout_marginBottom="22dp"
                 android:background="@drawable/bg_watermark_label"
                 android:orientation="vertical"
-                android:visibility="@{state.reviewing ? View.GONE : View.VISIBLE}">
+                android:visibility="@{vm.uiState.reviewing ? View.GONE : View.VISIBLE}">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@{state.timedText}"
+                    android:text="@{vm.uiState.timedText}"
                     android:textColor="#FFFFFF"
                     android:textSize="24sp"
                     android:textStyle="bold"
@@ -112,7 +112,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:maxLines="2"
-                        android:text="@{state.locationText}"
+                        android:text="@{vm.uiState.locationText}"
                         android:textAlignment="center"
                         android:textColor="#FFFFFF"
                         android:textSize="14sp"
@@ -129,14 +129,14 @@
                 android:text="@string/watermark_brand"
                 android:textColor="#CCFFFFFF"
                 android:textSize="12sp"
-                android:visibility="@{state.reviewing ? View.VISIBLE : View.GONE}" />
+                android:visibility="@{vm.uiState.reviewing ? View.VISIBLE : View.GONE}" />
 
             <ProgressBar
                 android:layout_width="44dp"
                 android:layout_height="44dp"
                 android:layout_gravity="center"
                 android:indeterminateTint="#B7E86B"
-                android:visibility="@{state.busy ? View.VISIBLE : View.GONE}" />
+                android:visibility="@{vm.uiState.busy ? View.VISIBLE : View.GONE}" />
 
             <TextView
                 android:layout_width="match_parent"
@@ -145,10 +145,10 @@
                 android:background="#99000000"
                 android:gravity="center"
                 android:padding="8dp"
-                android:text="@{state.statusText}"
+                android:text="@{vm.uiState.statusText}"
                 android:textColor="#FFFFFF"
                 android:textSize="13sp"
-                android:visibility="@{state.statusEnable() ? View.VISIBLE : View.GONE}" />
+                android:visibility="@{vm.uiState.statusEnable() ? View.VISIBLE : View.GONE}" />
         </FrameLayout>
 
         <FrameLayout
@@ -162,7 +162,7 @@
                 android:layout_height="match_parent"
                 android:gravity="center"
                 android:orientation="horizontal"
-                android:visibility="@{state.reviewing ? View.GONE : View.VISIBLE}">
+                android:visibility="@{vm.uiState.reviewing ? View.GONE : View.VISIBLE}">
 
                 <LinearLayout
                     android:layout_width="0dp"
@@ -202,7 +202,7 @@
                         android:layout_height="76dp"
                         android:background="@drawable/bg_watermark_shutter"
                         android:contentDescription="@string/watermark_capture_description"
-                        android:enabled="@{!state.busy}"
+                        android:enabled="@{!vm.uiState.busy}"
                         android:onClick="@{() -> actions.onCapture()}"
                         android:padding="24dp"
                         android:src="@android:drawable/ic_menu_camera"
@@ -229,7 +229,7 @@
                 android:layout_height="match_parent"
                 android:gravity="center"
                 android:orientation="horizontal"
-                android:visibility="@{state.reviewing ? View.VISIBLE : View.GONE}">
+                android:visibility="@{vm.uiState.reviewing ? View.VISIBLE : View.GONE}">
 
                 <LinearLayout
                     android:layout_width="0dp"

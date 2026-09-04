@@ -82,7 +82,7 @@ class WatermarkCameraActivity : ComponentActivity(), WaterCameraActionHandler {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityWatermarkCameraBinding.inflate(layoutInflater).apply {
-            state = viewModel.uiState.value
+            vm = viewModel
             actions = this@WatermarkCameraActivity
             lifecycleOwner = this@WatermarkCameraActivity
             executePendingBindings()
@@ -129,11 +129,6 @@ class WatermarkCameraActivity : ComponentActivity(), WaterCameraActionHandler {
 
     private fun collectMviState() {
         lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.uiState.collect(::render)
-            }
-        }
-        lifecycleScope.launch {
             // onResume 执行期间 Lifecycle 可能仍为 STARTED。此时消费启动相机的 Effect，
             // 会被 RESUMED 检查直接丢弃，导致黑屏；等 ON_RESUME 后再消费 Channel 中的指令。
             // 权限弹窗或切后台期间也暂停消费，返回前台后再执行相机和权限操作。
@@ -141,11 +136,6 @@ class WatermarkCameraActivity : ComponentActivity(), WaterCameraActionHandler {
                 viewModel.effects.collect(::handleEffect)
             }
         }
-    }
-
-    private fun render(state: WaterCameraUiState) {
-        binding.state = state
-        binding.executePendingBindings()
     }
 
     private fun handleEffect(effect: WaterCameraEffect) {

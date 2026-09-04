@@ -346,9 +346,9 @@ class WaterCameraViewModel(application: Application) : AndroidViewModel(applicat
         super.onCleared()
     }
 
-//    init {
-//        uiState.launchIn(viewModelScope)
-//    }
+    init {
+        uiState.launchIn(viewModelScope)
+    }
 
     private companion object {
         const val CLOCK_INTERVAL_MILLIS = 1_000L
