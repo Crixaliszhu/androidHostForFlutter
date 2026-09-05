@@ -5,7 +5,7 @@ import android.app.Application
 import android.os.Build
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.camera.WatermarkPhotoProcessor
+import com.example.camera.water.utils.WatermarkPhotoProcessor
 import com.example.camera.water.entity.WaterCameraUiState
 import com.example.camera.water.intent.WaterCameraEffect
 import com.example.camera.water.intent.WaterCameraUserIntent

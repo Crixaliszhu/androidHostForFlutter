@@ -1,4 +1,4 @@
-package com.example.camera
+package com.example.camera.water.utils
 
 import android.content.ContentValues
 import android.content.Context

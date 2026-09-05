@@ -1,4 +1,4 @@
-package com.example.camera
+package com.example.camera.water
 
 import android.Manifest
 import android.annotation.SuppressLint

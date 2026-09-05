@@ -1,7 +1,6 @@
 package com.example.camera.water
 
 import android.Manifest
-import android.graphics.Bitmap
 import android.graphics.Color
 import android.os.Bundle
 import android.provider.Settings
@@ -19,9 +18,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.alibaba.android.arouter.facade.annotation.Route
 import com.example.camera.CameraRouterPaths
-import com.example.camera.WatermarkCameraController
 import com.example.camera.databinding.ActivityWatermarkCameraBinding
-import com.example.camera.water.entity.WaterCameraUiState
 import com.example.camera.water.intent.WaterCameraActionHandler
 import com.example.camera.water.intent.WaterCameraEffect
 import com.example.camera.water.intent.WaterCameraUserIntent
