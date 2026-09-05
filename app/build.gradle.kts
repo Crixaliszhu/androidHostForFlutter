@@ -332,6 +332,7 @@ dependencies {
     implementation(project(":resume_api"))
     implementation(project(":business_bundle"))
     implementation(project(":widget"))
+    implementation(project(":local_mmkv"))
     // 第一阶段自研质量监控总入口，当前通过 ServiceModule 发布的 Maven AAR 接入。
     implementation(qualityMonitorDependencyNotation())
 }

@@ -1,21 +1,22 @@
 package com.example.hybriddemo.storage.mmkv
 
+import android.util.Log
+
 class RecruitDraftKvLds(
-    private val kvStore: KvStore,
 ) {
     fun saveLastDraft(id: String, title: String) {
-        kvStore.putString(RecruitDraftKvKeys.LAST_DRAFT_ID, id)
-        kvStore.putString(RecruitDraftKvKeys.LAST_DRAFT_TITLE, title)
+        Log.e("saveLastDraft", "id = ${id}, title = ${title}")
+        IRecruitDraftKv.saveID(id)
+        IRecruitDraftKv.saveTitle(title)
     }
 
     fun readLastDraft(): String {
-        val id = kvStore.getString(RecruitDraftKvKeys.LAST_DRAFT_ID, "none")
-        val title = kvStore.getString(RecruitDraftKvKeys.LAST_DRAFT_TITLE, "empty")
+        val id = IRecruitDraftKv.getId("none")
+        val title = IRecruitDraftKv.getTitle("empty")
         return "$id / $title"
     }
 
     fun clearLastDraft() {
-        kvStore.remove(RecruitDraftKvKeys.LAST_DRAFT_ID)
-        kvStore.remove(RecruitDraftKvKeys.LAST_DRAFT_TITLE)
+        IRecruitDraftKv.clearDraft()
     }
 }

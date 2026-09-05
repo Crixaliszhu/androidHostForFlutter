@@ -1,7 +1,6 @@
 package com.example.hybriddemo.storage.mmkv
 
 import com.example.hybriddemo.storage.room.IntListNode
-import org.junit.Assert.assertEquals
 import org.junit.Test
 
 class RecruitDraftKvLdsTest {
@@ -193,55 +192,5 @@ class RecruitDraftKvLdsTest {
             }
         }
         return null
-    }
-
-    private class FakeKvStore : KvStore {
-        val values = mutableMapOf<String, Any>()
-
-        override fun putString(key: String, value: String): Boolean {
-            values[key] = value
-            return true
-        }
-
-        override fun getString(key: String, defaultValue: String?): String? {
-            return values[key] as? String ?: defaultValue
-        }
-
-        override fun putInt(key: String, value: Int): Boolean = put(key, value)
-        override fun getInt(key: String, defaultValue: Int): Int =
-            values[key] as? Int ?: defaultValue
-
-        override fun putLong(key: String, value: Long): Boolean = put(key, value)
-        override fun getLong(key: String, defaultValue: Long): Long =
-            values[key] as? Long ?: defaultValue
-
-        override fun putBoolean(key: String, value: Boolean): Boolean = put(key, value)
-        override fun getBoolean(key: String, defaultValue: Boolean): Boolean =
-            values[key] as? Boolean ?: defaultValue
-
-        override fun putFloat(key: String, value: Float): Boolean = put(key, value)
-        override fun getFloat(key: String, defaultValue: Float): Float =
-            values[key] as? Float ?: defaultValue
-
-        override fun putDouble(key: String, value: Double): Boolean = put(key, value)
-        override fun getDouble(key: String, defaultValue: Double): Double =
-            values[key] as? Double ?: defaultValue
-
-        override fun putBytes(key: String, value: ByteArray): Boolean = put(key, value)
-        override fun getBytes(key: String, defaultValue: ByteArray?): ByteArray? =
-            values[key] as? ByteArray ?: defaultValue
-
-        override fun remove(key: String) {
-            values.remove(key)
-        }
-
-        override fun clear() {
-            values.clear()
-        }
-
-        private fun put(key: String, value: Any): Boolean {
-            values[key] = value
-            return true
-        }
     }
 }

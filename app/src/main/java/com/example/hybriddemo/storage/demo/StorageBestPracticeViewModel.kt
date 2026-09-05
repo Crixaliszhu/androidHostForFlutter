@@ -5,8 +5,6 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.hybriddemo.storage.datastore.DataStorePreferenceStore
 import com.example.hybriddemo.storage.datastore.RecruitPreferenceLds
-import com.example.hybriddemo.storage.mmkv.MmkvKvStore
-import com.example.hybriddemo.storage.mmkv.RecruitDraftKvKeys
 import com.example.hybriddemo.storage.mmkv.RecruitDraftKvLds
 import com.example.hybriddemo.storage.room.RecruitHistoryRepository
 import com.example.hybriddemo.storage.room.StorageDemoDatabaseProvider
@@ -21,9 +19,7 @@ class StorageBestPracticeViewModel(
     application: Application,
 ) : AndroidViewModel(application) {
 
-    private val kvLds = RecruitDraftKvLds(
-        MmkvKvStore(RecruitDraftKvKeys.NAMESPACE)
-    )
+    private val kvLds = RecruitDraftKvLds()
     private val preferenceLds = RecruitPreferenceLds(
         DataStorePreferenceStore(
             context = application,
