@@ -73,6 +73,7 @@ include(":resume_api")
 include(":business_bundle")
 include(":camera")
 include(":widget")
+include(":water_camera")
 
 // 2) 把 flutter_module 当成 Gradle 子工程引入。
 //    Flutter SDK 在 `<module>/.android/include_flutter.groovy` 里提供了这个胶水脚本，
