@@ -145,6 +145,9 @@ class PermissionController {
                 positiveClick = {
                     // 发起权限请求
                     Log.e(TAG, "发起权限请求")
+                    permissionList.forEach {
+                        permissionReqRepo.updateToRequested(it)
+                    }
                     permissionRequestLauncher?.launch(permissionList.toTypedArray())
                 },
             )
