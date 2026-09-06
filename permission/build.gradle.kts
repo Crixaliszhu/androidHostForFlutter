@@ -25,7 +25,8 @@ android {
         }
     }
 
-    dependencies{
+    dependencies {
         implementation(project(":local_mmkv"))
+        implementation(project(":widget"))
     }
 }

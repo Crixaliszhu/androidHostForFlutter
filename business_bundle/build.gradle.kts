@@ -18,4 +18,5 @@ dependencies {
     // camera 包含 DataBinding 页面。使用 api 将其 DataBinding mapper 元数据继续暴露给最终 app，
     // 否则宿主的聚合 DataBinderMapper 找不到 camera 布局，inflate() 会在运行时返回 null。
     api(project(":camera"))
+    api(project(":permission"))
 }

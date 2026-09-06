@@ -16,7 +16,7 @@ internal annotation class PermissionReqResultType {
         const val GRANTED = 1
 
         /**
-         * 提示弹窗给的结果
+         * 在提示弹窗-中断
          */
         const val NOTICE_NO = 2
 

@@ -30,7 +30,7 @@ class DemoApplication : Application() {
             ARouter.openDebug()
         }
         ARouter.init(this)
-        SentryInitializer.init(this)
+//        SentryInitializer.init(this)
         // 自研质量监控尽量靠前初始化，保证后续初始化阶段的崩溃和启动耗时也能被采集。
         QualityMonitorInitializer.init(
             application = this,

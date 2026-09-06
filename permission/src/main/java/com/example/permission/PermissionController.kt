@@ -3,14 +3,26 @@ package com.example.permission
 import android.Manifest
 import android.app.Activity
 import android.content.Context
+import android.content.Intent
+import android.net.Uri
 import android.os.Build
+import android.provider.Settings
+import android.util.Log
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
 import androidx.core.content.pm.PermissionInfoCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.FragmentManager
 import com.example.permission.annotation.PermissionReqResultType
+import com.example.permission.dialog.CommonPermissionReqDialog
+import com.example.permission.dialog.IPermissionReqDialog
 import com.example.permission.kv.PermissionReqRepo
+import dagger.hilt.EntryPoint
+import dagger.hilt.InstallIn
+import dagger.hilt.android.EntryPointAccessors
+import dagger.hilt.components.SingletonComponent
 import kotlin.properties.Delegates
 
 class PermissionController {
@@ -20,25 +32,85 @@ class PermissionController {
     private var activity: FragmentActivity? = null
     private var manager: FragmentManager? = null
     private val permissionReqRepo = PermissionReqRepo()
+    private val permissionReqDialogMap: Map<String, IPermissionReqDialog>
+    private var forwardToSettingsLauncher: ActivityResultLauncher<Intent>? = null
+    private var permissionRequestLauncher: ActivityResultLauncher<Array<String>>? = null
 
-    internal constructor(fragment: Fragment) {
-        this.fragment = fragment
-        this.manager = fragment.childFragmentManager
+    @EntryPoint
+    @InstallIn(SingletonComponent::class)
+    interface PermissionReqMapEntryProvider {
+        fun providerPermissionReqDialogMap(): Map<String, IPermissionReqDialog>
     }
 
-    internal constructor(activity: FragmentActivity) {
+    internal constructor(
+        fragment: Fragment,
+        permissionReqDialogMap: Map<String, IPermissionReqDialog>
+    ) {
+        this.fragment = fragment
+        this.manager = fragment.childFragmentManager
+        this.permissionReqDialogMap = permissionReqDialogMap
+        createLauncher()
+        createPermissionLauncher()
+    }
+
+    internal constructor(
+        activity: FragmentActivity,
+        permissionReqDialogMap: Map<String, IPermissionReqDialog>
+    ) {
         this.activity = activity
         this.manager = activity.supportFragmentManager
+        this.permissionReqDialogMap = permissionReqDialogMap
+        createLauncher()
+        createPermissionLauncher()
+    }
+
+    private fun createLauncher() {
+        forwardToSettingsLauncher = (fragment ?: activity)?.registerForActivityResult(
+            ActivityResultContracts.StartActivityForResult()
+        ) {
+            Log.e(TAG, "设置页打开 结果接受--")
+            resultCallback?.invoke(
+                permissionList.all { isGranted(it) },
+                PermissionReqResultType.SETTING
+            )
+        }
+    }
+
+    private fun createPermissionLauncher() {
+        permissionRequestLauncher = (fragment ?: activity)?.registerForActivityResult(
+            ActivityResultContracts.RequestMultiplePermissions()
+        ) {
+            Log.e(TAG, "权限请求 结果接受--")
+            resultCallback?.invoke(
+                permissionList.all { isGranted(it) },
+                PermissionReqResultType.SYSTEM
+            )
+        }
     }
 
     companion object {
 
+        private const val TAG = "PermissionController"
+
         fun newInstance(activity: FragmentActivity): PermissionController {
-            return PermissionController(activity)
+            val process = EntryPointAccessors.fromApplication(
+                activity,
+                PermissionReqMapEntryProvider::class.java
+            )
+            return PermissionController(activity, process.providerPermissionReqDialogMap())
         }
 
         fun newInstance(fragment: Fragment): PermissionController {
-            return PermissionController(fragment)
+            val process = fragment.context?.let {
+                EntryPointAccessors.fromApplication(
+                    it,
+                    PermissionReqMapEntryProvider::class.java
+                )
+            }
+            return PermissionController(
+                fragment,
+                process?.providerPermissionReqDialogMap() ?: emptyMap()
+            )
         }
     }
 
@@ -46,13 +118,14 @@ class PermissionController {
         request(arrayListOf(permission), callback)
     }
 
-    private fun request(permissionList: List<String>, callback: PermissionReqResultCallback) {
+    fun request(permissionList: List<String>, callback: PermissionReqResultCallback) {
         if (permissionList.isEmpty()) return
         this.permissionList = permissionList
         this.resultCallback = callback
         val notGranted = permissionList.filter { !isGranted(it) }
         //有权限不进入申请流程
         if (notGranted.isEmpty()) {
+            Log.e(TAG, "有权限不进入申请流程--")
             callback(true, PermissionReqResultType.GRANTED)
             return
         }
@@ -60,10 +133,49 @@ class PermissionController {
         val allShouldHint = notGranted.all {
             shouldShowHint(it)
         }
+        val permissionReqDialog = getPermissionReqDialog()
         if (allShouldHint) {
             // 展示权限请求提醒弹窗
+            Log.e(TAG, "展示权限请求提醒弹窗")
+            permissionReqDialog?.permissionReqHint(
+                fragmentManager = manager,
+                negativeClick = {
+                    callback.invoke(false, PermissionReqResultType.NOTICE_NO)
+                },
+                positiveClick = {
+                    // 发起权限请求
+                    Log.e(TAG, "发起权限请求")
+                    permissionRequestLauncher?.launch(permissionList.toTypedArray())
+                },
+            )
         } else {
             // 展示引导去设置页弹窗
+            Log.e(TAG, "展示引导去设置页弹窗")
+            permissionReqDialog?.forward2Setting(
+                context = getContext(),
+                fragmentManager = manager,
+                negativeClick = {
+                    callback.invoke(false, PermissionReqResultType.NOTICE_NO)
+                },
+                positiveClick = {
+                    kotlin.runCatching {
+                        Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+                            data = Uri.fromParts("package", getContext()?.packageName, null)
+                        }
+                    }.getOrNull()?.also {
+                        forwardToSettingsLauncher?.launch(it)
+                    }
+                },
+            )
+        }
+    }
+
+    private fun getPermissionReqDialog(): IPermissionReqDialog? {
+        if (permissionList.isEmpty()) return null
+        val key = permissionList.joinToString(",")
+        return permissionReqDialogMap.getOrElse(key) {
+            Log.e(TAG, "未找到可用的弹窗")
+            CommonPermissionReqDialog()
         }
     }
 

@@ -4,6 +4,7 @@ import android.Manifest
 import android.graphics.Color
 import android.os.Bundle
 import android.provider.Settings
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.OnBackPressedCallback
@@ -13,6 +14,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -24,6 +26,7 @@ import com.example.camera.water.intent.WaterCameraEffect
 import com.example.camera.water.intent.WaterCameraUserIntent
 import com.example.camera.water.permission.PermissionUtils
 import com.example.camera.water.vm.WaterCameraViewModel
+import com.example.permission.PermissionController
 import kotlinx.coroutines.launch
 
 /**
@@ -33,10 +36,15 @@ import kotlinx.coroutines.launch
  * 业务状态流转、定位、生成水印图、保存相册都放在 ViewModel/Controller 中。
  */
 @Route(path = CameraRouterPaths.WATERMARK_CAMERA)
-class WatermarkCameraActivity : ComponentActivity(), WaterCameraActionHandler {
+class WatermarkCameraActivity : FragmentActivity(), WaterCameraActionHandler {
 
     private lateinit var binding: ActivityWatermarkCameraBinding
     private val viewModel by viewModels<WaterCameraViewModel>()
+    private lateinit var permissionController: PermissionController
+
+    companion object {
+        private const val TAG = "WatermarkCameraActivity"
+    }
 
     private val cameraController by lazy {
         WatermarkCameraController(
@@ -58,26 +66,9 @@ class WatermarkCameraActivity : ComponentActivity(), WaterCameraActionHandler {
         )
     }
 
-    private val cameraPermissionLauncher = registerForActivityResult(
-        ActivityResultContracts.RequestPermission(),
-    ) { granted ->
-        viewModel.dispatch(WaterCameraUserIntent.CameraPermissionResult(granted))
-    }
-
-    private val locationPermissionLauncher = registerForActivityResult(
-        ActivityResultContracts.RequestMultiplePermissions(),
-    ) { result ->
-        viewModel.dispatch(WaterCameraUserIntent.LocationPermissionResult(result.values.any { it }))
-    }
-
-    private val storagePermissionLauncher = registerForActivityResult(
-        ActivityResultContracts.RequestPermission(),
-    ) { granted ->
-        viewModel.dispatch(WaterCameraUserIntent.StoragePermissionResult(granted))
-    }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        permissionController = PermissionController.newInstance(this)
         binding = ActivityWatermarkCameraBinding.inflate(layoutInflater).apply {
             vm = viewModel
             actions = this@WatermarkCameraActivity
@@ -138,20 +129,29 @@ class WatermarkCameraActivity : ComponentActivity(), WaterCameraActionHandler {
     private fun handleEffect(effect: WaterCameraEffect) {
         when (effect) {
             WaterCameraEffect.RequestCameraPermission -> {
-                cameraPermissionLauncher.launch(Manifest.permission.CAMERA)
+                permissionController.request(Manifest.permission.CAMERA) { granted, type ->
+                    Log.e(TAG, "permissionController 请求权限结果 ${granted},${type}")
+                    viewModel.dispatch(WaterCameraUserIntent.CameraPermissionResult(granted))
+                }
             }
 
             WaterCameraEffect.RequestLocationPermission -> {
-                locationPermissionLauncher.launch(
-                    arrayOf(
+                permissionController.request(
+                    listOf(
                         Manifest.permission.ACCESS_FINE_LOCATION,
                         Manifest.permission.ACCESS_COARSE_LOCATION,
-                    ),
-                )
+                    )
+                ) { granted, type ->
+                    viewModel.dispatch(WaterCameraUserIntent.LocationPermissionResult(granted))
+                }
             }
 
             WaterCameraEffect.RequestStoragePermission -> {
-                storagePermissionLauncher.launch(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                permissionController.request(
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE
+                ){granted, type ->
+                    viewModel.dispatch(WaterCameraUserIntent.StoragePermissionResult(granted))
+                }
             }
 
             WaterCameraEffect.StartCameraPreview -> startCameraPreviewIfResumed()
