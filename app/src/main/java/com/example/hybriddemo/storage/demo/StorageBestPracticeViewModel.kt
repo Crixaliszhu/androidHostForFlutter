@@ -1,13 +1,12 @@
 package com.example.hybriddemo.storage.demo
 
-import android.app.Application
-import androidx.lifecycle.AndroidViewModel
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.hybriddemo.storage.datastore.DataStorePreferenceStore
 import com.example.hybriddemo.storage.datastore.RecruitPreferenceLds
 import com.example.hybriddemo.storage.mmkv.RecruitDraftKvLds
 import com.example.hybriddemo.storage.room.RecruitHistoryRepository
-import com.example.hybriddemo.storage.room.StorageDemoDatabaseProvider
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -15,20 +14,13 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-class StorageBestPracticeViewModel(
-    application: Application,
-) : AndroidViewModel(application) {
-
-    private val kvLds = RecruitDraftKvLds()
-    private val preferenceLds = RecruitPreferenceLds(
-        DataStorePreferenceStore(
-            context = application,
-            storeName = "demo_recruit_preferences",
-        )
-    )
-    private val historyRepository = RecruitHistoryRepository(
-        StorageDemoDatabaseProvider.get(application).recruitHistoryDao()
-    )
+/** 存储示例的页面状态，由 Hilt 提供存储依赖以避免页面自行组装对象。 */
+@HiltViewModel
+class StorageBestPracticeViewModel @Inject constructor(
+    private val kvLds: RecruitDraftKvLds,
+    private val preferenceLds: RecruitPreferenceLds,
+    private val historyRepository: RecruitHistoryRepository,
+) : ViewModel() {
 
     private val _uiState = MutableStateFlow(StorageDemoUiState())
     val uiState: StateFlow<StorageDemoUiState> = _uiState.asStateFlow()

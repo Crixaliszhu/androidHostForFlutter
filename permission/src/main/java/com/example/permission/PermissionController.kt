@@ -10,6 +10,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.FragmentManager
 import com.example.permission.annotation.PermissionReqResultType
+import com.example.permission.kv.PermissionReqRepo
 import kotlin.properties.Delegates
 
 class PermissionController {
@@ -18,6 +19,7 @@ class PermissionController {
     private var fragment: Fragment? = null
     private var activity: FragmentActivity? = null
     private var manager: FragmentManager? = null
+    private val permissionReqRepo = PermissionReqRepo()
 
     internal constructor(fragment: Fragment) {
         this.fragment = fragment
@@ -58,6 +60,11 @@ class PermissionController {
         val allShouldHint = notGranted.all {
             shouldShowHint(it)
         }
+        if (allShouldHint) {
+            // 展示权限请求提醒弹窗
+        } else {
+            // 展示引导去设置页弹窗
+        }
     }
 
     private fun getContext(): Context? {
@@ -73,7 +80,8 @@ class PermissionController {
 
 
     /**
-     * 是否应该弹出提示弹窗
+     * 是否应该弹出提示弹窗：请求权限提示
+     * 用户点击拒绝不再提醒后，展示引导至设置页弹窗
      */
     private fun shouldShowHint(permission: String): Boolean {
         if (permission.isBlank()) return false
@@ -83,10 +91,12 @@ class PermissionController {
         ) {
             return false
         }
-        // 是否可以在显示提示弹窗
+        // 是否可以再显示提示弹窗
         val canAgain = getActivity()?.let {
             ActivityCompat.shouldShowRequestPermissionRationale(it, permission)
-        }?:false
+        } ?: false
+        val requested = permissionReqRepo.isRequested(permission)
+        return !requested || canAgain
     }
 
     /**

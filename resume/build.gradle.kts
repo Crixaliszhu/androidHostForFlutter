@@ -41,4 +41,5 @@ android {
 dependencies {
     implementation(project(":router"))
     implementation(project(":resume_api"))
+    implementation(project(":widget"))
 }

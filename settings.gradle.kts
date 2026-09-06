@@ -17,10 +17,6 @@ pluginManagement {
         maven { setUrl("https://storage.googleapis.com/download.flutter.io") }
     }
     plugins {
-        id("com.android.application") version "8.6.0"
-        id("com.android.library") version "8.6.0"
-        id("org.jetbrains.kotlin.android") version "1.9.22"
-        id("org.jetbrains.kotlin.jvm") version "1.9.22"
         id("io.gitlab.arturbosch.detekt") version "1.23.7"
         id("io.sentry.android.gradle") version "6.16.0"
     }

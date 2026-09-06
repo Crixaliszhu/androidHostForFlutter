@@ -7,6 +7,7 @@ import com.example.flutterbiz.DemoFlutterInitManager
 import com.example.hybriddemo.sentry.SentryInitializer
 import com.example.qualitymonitor.QualityMonitorConfig
 import com.example.qualitymonitor.QualityMonitorInitializer
+import dagger.hilt.android.HiltAndroidApp
 import com.tencent.mmkv.MMKV
 
 /**
@@ -15,6 +16,7 @@ import com.tencent.mmkv.MMKV
  * Demo 中集中初始化 Sentry、自研质量监控、MMKV 和 Flutter 引擎；真实项目里的
  * `CustomApplication` 还可能包含埋点、广告、IM 等更多启动项，这里只保留教学主线。
  */
+@HiltAndroidApp
 class DemoApplication : Application() {
     companion object {
         /** 进程加载 Application 类时记录时间，供自研启动耗时采集计算冷启动总耗时。 */

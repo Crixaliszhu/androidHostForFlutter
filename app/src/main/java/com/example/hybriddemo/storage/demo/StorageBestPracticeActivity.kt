@@ -4,6 +4,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
+import dagger.hilt.android.AndroidEntryPoint
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -32,7 +33,9 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 
+/** 展示存储方案，通过 Hilt 获取与页面生命周期关联的 ViewModel。 */
 @com.alibaba.android.arouter.facade.annotation.Route(path = com.example.hybriddemo.router.DemoRouterPaths.STORAGE_BEST_PRACTICE)
+@AndroidEntryPoint
 class StorageBestPracticeActivity : ComponentActivity() {
 
     private val vm by viewModels<StorageBestPracticeViewModel>()

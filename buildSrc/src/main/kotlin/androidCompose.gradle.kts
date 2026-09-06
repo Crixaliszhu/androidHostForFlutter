@@ -1,3 +1,12 @@
+import dagger.hilt.android.plugin.HiltExtension
+import org.jetbrains.kotlin.gradle.plugin.KaptExtension
+
+// 集中启用 Hilt 和 kapt，业务模块无需重复维护注入编译配置。
+apply(plugin = "org.jetbrains.kotlin.kapt")
+apply(plugin = "com.google.dagger.hilt.android")
+extensions.configure<KaptExtension> { correctErrorTypes = true }
+extensions.configure<HiltExtension> { enableAggregatingTask = false }
+
 val composeCompileSdk = 35
 val composeMinSdk = 25
 val composeCompilerVersion = "1.5.8"
@@ -42,6 +51,9 @@ dependencies {
     add("implementation", "androidx.compose.ui:ui-graphics")
     add("implementation", "androidx.compose.ui:ui-tooling-preview")
     add("implementation", "androidx.compose.material3:material3")
+    // 与当前 Kotlin 1.9.22、AGP 8.6 构建链配套，运行库和处理器保持同版本。
+    add("implementation", "com.google.dagger:hilt-android:2.51.1")
+    add("kapt", "com.google.dagger:hilt-compiler:2.51.1")
 
     add("testImplementation", "junit:junit:4.13.2")
     add("androidTestImplementation", "androidx.test.ext:junit:1.2.1")

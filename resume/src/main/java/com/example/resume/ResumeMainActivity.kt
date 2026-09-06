@@ -4,17 +4,17 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
-import android.widget.Toast
-import androidx.activity.ComponentActivity
 import androidx.activity.enableEdgeToEdge
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.fragment.app.FragmentActivity
 import com.alibaba.android.arouter.facade.annotation.Route
 import com.example.resume.route.ResumeRouterImpl
+import com.example.widget.titlebar.dialog.CommonDialog2
 
 
 @Route(path = ResumeRouterImpl.RESUME_MAIN)
-class ResumeMainActivity : ComponentActivity() {
+class ResumeMainActivity : FragmentActivity() {
 
     companion object {
 
@@ -38,7 +38,15 @@ class ResumeMainActivity : ComponentActivity() {
             finish()
         }
         findViewById<Button>(R.id.btn_resume_toast).setOnClickListener {
-            Toast.makeText(this, "这是Resume页toast", Toast.LENGTH_SHORT).show()
+//            Toast.makeText(this, "这是Resume页toast", Toast.LENGTH_SHORT).show()
+            CommonDialog2.show(
+                supportFragmentManager,
+                tag = "commonDialog",
+                title = "自定义弹窗标题",
+                content = "这是我的弹窗内容",
+                negativeClick = {},
+                positiveClick = {},
+            )
         }
     }
 }

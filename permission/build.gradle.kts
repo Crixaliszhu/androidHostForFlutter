@@ -24,4 +24,8 @@ android {
             )
         }
     }
+
+    dependencies{
+        implementation(project(":local_mmkv"))
+    }
 }

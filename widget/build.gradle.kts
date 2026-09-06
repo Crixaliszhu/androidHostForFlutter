@@ -11,6 +11,11 @@ android {
         targetSdk = 35
         consumerProguardFiles("consumer-rules.pro")
     }
+
+    buildFeatures {
+        // widget 提供 XML BindingAdapter，必须生成 Data Binding 适配代码。
+        dataBinding = true
+    }
 }
 
 dependencies {
