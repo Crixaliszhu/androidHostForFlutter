@@ -1,6 +1,8 @@
 package com.example.widget.titlebar.dialog
 
 import android.app.Dialog
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -57,6 +59,7 @@ class CommonDialog2 : DialogFragment() {
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val dialog = super.onCreateDialog(savedInstanceState)
         dialog.window?.apply {
+            setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
             AnimConfig.initShowAnim(AnimConfig.ANIM_TYPE_CENTER, this)
         }
         return dialog
@@ -82,12 +85,12 @@ class CommonDialog2 : DialogFragment() {
 
             btnCancel.setOnClickListener {
                 negativeClick?.invoke()
-                dismissAllowingStateLoss()
+                dismiss()
             }
 
             btnConfirm.setOnClickListener {
                 positiveClick?.invoke()
-                dismissAllowingStateLoss()
+                dismiss()
             }
         }
     }
@@ -107,12 +110,12 @@ class CommonDialog2 : DialogFragment() {
     }
 
     override fun dismiss() {
-        super.dismiss()
-        dialog?.let {
-            it.window?.let { window ->
-                AnimConfig.initHideAnim(AnimConfig.ANIM_TYPE_CENTER, window, this)
-            }
+        val window = dialog?.window
+        if(window == null){
+            super.dismiss()
+            return
         }
+        AnimConfig.initHideAnim(AnimConfig.ANIM_TYPE_CENTER, window, this)
     }
 
     private fun showAllowingStateLoss(manager: FragmentManager?, tag: String) {
