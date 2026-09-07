@@ -37,5 +37,6 @@ android {
     dependencies{
         implementation(project(":widget"))
         implementation(project(":permission"))
+        implementation(project(":camera_api"))
     }
 }

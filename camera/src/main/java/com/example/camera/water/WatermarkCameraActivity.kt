@@ -1,6 +1,8 @@
 package com.example.camera.water
 
 import android.Manifest
+import android.content.Context
+import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
 import android.provider.Settings
@@ -27,6 +29,7 @@ import com.example.camera.water.intent.WaterCameraUserIntent
 import com.example.camera.water.permission.PermissionUtils
 import com.example.camera.water.vm.WaterCameraViewModel
 import com.example.permission.PermissionController
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
 /**
@@ -36,6 +39,7 @@ import kotlinx.coroutines.launch
  * 业务状态流转、定位、生成水印图、保存相册都放在 ViewModel/Controller 中。
  */
 @Route(path = CameraRouterPaths.WATERMARK_CAMERA)
+@AndroidEntryPoint
 class WatermarkCameraActivity : FragmentActivity(), WaterCameraActionHandler {
 
     private lateinit var binding: ActivityWatermarkCameraBinding
@@ -44,6 +48,10 @@ class WatermarkCameraActivity : FragmentActivity(), WaterCameraActionHandler {
 
     companion object {
         private const val TAG = "WatermarkCameraActivity"
+
+        fun start(context: Context) {
+            context.startActivity(Intent(context, WatermarkCameraActivity::class.java))
+        }
     }
 
     private val cameraController by lazy {
@@ -149,7 +157,7 @@ class WatermarkCameraActivity : FragmentActivity(), WaterCameraActionHandler {
             WaterCameraEffect.RequestStoragePermission -> {
                 permissionController.request(
                     Manifest.permission.WRITE_EXTERNAL_STORAGE
-                ){granted, type ->
+                ) { granted, type ->
                     viewModel.dispatch(WaterCameraUserIntent.StoragePermissionResult(granted))
                 }
             }

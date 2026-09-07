@@ -11,4 +11,5 @@ package com.example.camera
 object CameraRouterPaths {
     const val CAMERA_DEMO = "/camera/main"
     const val WATERMARK_CAMERA = "/water/camera/display"
+    const val WATERMARK_CAMERA2 = "/water/camera/display2"
 }

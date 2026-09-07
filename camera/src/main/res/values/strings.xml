@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="watermark_camera_title">水印相机</string>
+    <string name="watermark_camera_title2">水印相机复制体</string>
     <string name="watermark_location_default">我在这里</string>
     <string name="watermark_location_action">定位</string>
     <string name="watermark_capture_action">拍照</string>

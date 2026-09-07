@@ -68,6 +68,7 @@ include(":resume")
 include(":resume_api")
 include(":business_bundle")
 include(":camera")
+include(":camera_api")
 include(":widget")
 include(":water_camera")
 include(":permission")
@@ -149,7 +150,7 @@ fun ensureApiModule(apiProjectPath: String) {
             compileSdk = 35
 
             defaultConfig {
-                minSdk = 24
+                minSdk = 25
                 consumerProguardFiles("consumer-rules.pro")
             }
 

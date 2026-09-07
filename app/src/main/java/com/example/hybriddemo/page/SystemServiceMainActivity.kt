@@ -14,7 +14,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import com.alibaba.android.arouter.facade.annotation.Route
 import com.alibaba.android.arouter.launcher.ARouter
+import com.example.camera.api.CameraRouterApiPaths
+import com.example.camera.api.ICameraRouterService
 import com.example.hybriddemo.router.DemoRouterPaths
+import com.example.router.RouterApi
 import com.example.widget.titlebar.YpPageScaffold
 
 @Route(path = DemoRouterPaths.SYSTEM_PAGE)
@@ -67,11 +70,21 @@ class SystemServiceMainActivity : ComponentActivity() {
                     Button(
                         modifier = Modifier.fillMaxWidth(),
                         onClick = {
-                            ARouter.getInstance().build(DemoRouterPaths.WATER_CAMERA)
-                                .navigation(this@SystemServiceMainActivity)
+                            RouterApi.getByClass(ICameraRouterService::class.java)
+                                ?.openWatermarkCamera(this@SystemServiceMainActivity)
                         }
                     ) {
                         Text("水印相机-Camera")
+                    }
+
+                    Button(
+                        modifier = Modifier.fillMaxWidth(),
+                        onClick = {
+                            RouterApi.getByClass(ICameraRouterService::class.java)
+                                ?.openWatermark2Camera(this@SystemServiceMainActivity)
+                        }
+                    ) {
+                        Text("水印相机2-Camera2")
                     }
                 }
             }

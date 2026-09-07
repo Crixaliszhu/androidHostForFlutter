@@ -40,5 +40,6 @@
             android:label="水印相机"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.WatermarkCamera" />
+        <activity android:name="com.example.camera.water2.Watermark2CameraActivity" />
     </application>
 </manifest>

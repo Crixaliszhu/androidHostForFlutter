@@ -15,6 +15,7 @@ data class WaterCameraUiState(
     val timedText: String = "",
     val locationText: String = DEFAULT_LOCATION,
     val statusText: String = "",
+    /** 相机预览状态 */
     val reviewing: Boolean = false,
     val busy: Boolean = false,
     val previewBitmap: Bitmap? = null,
