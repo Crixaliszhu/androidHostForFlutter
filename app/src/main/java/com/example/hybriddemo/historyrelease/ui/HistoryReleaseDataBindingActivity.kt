@@ -7,13 +7,15 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import com.alibaba.android.arouter.facade.annotation.Route
 import com.example.hybriddemo.databinding.ActivityHistoryReleaseDataBindingBinding
 import com.example.hybriddemo.historyrelease.presentation.HistoryReleaseDemoActionProxy
 import com.example.hybriddemo.historyrelease.presentation.HistoryReleaseDemoEvent
 import com.example.hybriddemo.historyrelease.presentation.HistoryReleaseDemoViewModel
+import com.example.widget.titlebar.toolbar.ToolBarManager2
 import kotlinx.coroutines.launch
 
-@com.alibaba.android.arouter.facade.annotation.Route(path = com.example.hybriddemo.router.DemoRouterPaths.HISTORY_DATA_BINDING)
+@Route(path = com.example.hybriddemo.router.DemoRouterPaths.HISTORY_DATA_BINDING)
 class HistoryReleaseDataBindingActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityHistoryReleaseDataBindingBinding
@@ -23,6 +25,11 @@ class HistoryReleaseDataBindingActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityHistoryReleaseDataBindingBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        ToolBarManager2.attach(
+            this, config = ToolBarManager2.Config(
+                title = "DataBinding示例页",
+            )
+        )
         binding.lifecycleOwner = this
         binding.vm = vm
         binding.action = HistoryReleaseDemoActionProxy(vm)

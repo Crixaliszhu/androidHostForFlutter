@@ -2,4 +2,36 @@
 <resources>
     <color name="primary">#0092ff</color>
     <color name="white">#ffffff</color>
+    <color name="blue100">#FF00CBFF</color>
+    <color name="blue75">#BF00CBFF</color>
+    <color name="blue10">#1A00CBFF</color>
+    <color name="orange100">#FFFF9800</color>
+    <color name="orange75">#BFFF9800</color>
+    <color name="orange10">#1AFF9800</color>
+    <color name="green100">#FF46DB7A</color>
+    <color name="red100">#FFF74742</color>
+    <color name="black100">#FF000000</color>
+    <color name="black85">#D9000000</color>
+    <color name="black65">#A6000000</color>
+    <color name="color_46db7a">#FF46DB7A</color>
+    <color name="color_light_green_100">#FFECFBF1</color>
+    <color name="color_11cb52">#11CB52</color>
+
+    <color name="color_EFF1F6">#EFF1F6</color>
+    <color name="color_F74742">#F74742</color>
+    <color name="color_E5F4FF">#FFE5F4FF</color>
+    <color name="color_FA4930">#FA4930</color>
+
+    <color name="color_e6e6e6">#e6e6e6</color>
+    <color name="color_BABABA">#BABABA</color>
+    <color name="gray_f5f6fa">#F5F6FA</color>
+    <color name="color_e0f3ff">#E0F3FF</color>
+    <color name="color_ff8904">#FF8904</color>
+    <color name="color_ffefde">#FFEFDE</color>
+    <color name="color_464E61">#464E61</color>
+    <color name="color_E8362E">#E8362E</color>
+    <color name="color_00CBFF">#00CBFF</color>
+    <color name="transparent">#00000000</color>
+    <color name="colorTextLowGray">#7F7E7E</color>
+
 </resources>
