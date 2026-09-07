@@ -27,6 +27,7 @@ import com.example.permission.PermissionUtils
 import java.util.concurrent.Executor
 import kotlin.math.abs
 
+/** 管理水印相机复制页的 Camera2 预览、拍照，以及随页面生命周期释放相机资源。 */
 class Watermark2CameraController(
     context: Context,
     private val onCameraReady: () -> Unit,
@@ -60,12 +61,13 @@ class Watermark2CameraController(
     private var capturing = false
 
     private val textureListener = object : TextureView.SurfaceTextureListener {
-        override fun onSurfaceTextureAvailable(surface: SurfaceTexture, width: Int, height: Int) =
-            Unit
-
-        override fun onSurfaceTextureSizeChanged(surface: SurfaceTexture, width: Int, height: Int) {
+        override fun onSurfaceTextureAvailable(surface: SurfaceTexture, width: Int, height: Int) {
+            // Surface 就绪后不一定发生尺寸变化，必须在此接续等待中的相机启动。
             if (started) openCamera(width, height)
         }
+
+        override fun onSurfaceTextureSizeChanged(surface: SurfaceTexture, width: Int, height: Int) =
+            Unit
 
         override fun onSurfaceTextureDestroyed(surface: SurfaceTexture): Boolean {
             closeCamera()
@@ -105,6 +107,8 @@ class Watermark2CameraController(
     /** Activity.onResume 调用。SurfaceTexture 尚未创建时，控制器会等待 TextureView 回调。 */
     fun start(preview: TextureView) {
         textureView = preview
+        // 已就绪的 Surface 也可能销毁重建，始终监听才能释放资源并恢复预览。
+        preview.surfaceTextureListener = textureListener
         started = true
         startCameraThread()
         if (!hasCameraPermission()) {
@@ -115,8 +119,6 @@ class Watermark2CameraController(
         if (cameraDevice != null || opening) return
         if (preview.isAvailable) {
             openCamera(preview.width, preview.height)
-        } else {
-            preview.surfaceTextureListener = textureListener
         }
     }
 
