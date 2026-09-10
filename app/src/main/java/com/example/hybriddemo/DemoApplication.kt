@@ -25,6 +25,9 @@ class DemoApplication : Application() {
 
     override fun onCreate() {
         super.onCreate()
+        // 每个进程都会执行 Application；AIDL 演示进程不需要 Flutter 引擎、路由和主进程监控。
+        // 只隔离新增的进程，保留已有 Messenger/ANR 示例的初始化行为。
+        if (isAidlDemoProcess()) return
         if (BuildConfig.DEBUG) {
             ARouter.openLog()
             ARouter.openDebug()
@@ -52,5 +55,16 @@ class DemoApplication : Application() {
         //  - 主引擎常驻
         //  - idle 预热
         DemoFlutterInitManager.init(this, isKeepMainEngine = true)
+    }
+
+    private fun isAidlDemoProcess(): Boolean {
+        val processName = if (android.os.Build.VERSION.SDK_INT >= 28) {
+            getProcessName()
+        } else {
+            // 低版本通过系统进程表定位自身，不把 applicationId 硬编码，兼容马甲包。
+            val manager = getSystemService(ACTIVITY_SERVICE) as android.app.ActivityManager
+            manager.runningAppProcesses?.firstOrNull { it.pid == android.os.Process.myPid() }?.processName
+        }
+        return processName == packageName + com.example.hybriddemo.ipc.aidl.AidlDemoService.PROCESS_SUFFIX
     }
 }

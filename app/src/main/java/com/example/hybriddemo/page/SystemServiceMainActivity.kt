@@ -20,6 +20,7 @@ import com.example.hybriddemo.router.DemoRouterPaths
 import com.example.router.RouterApi
 import com.example.widget.titlebar.YpPageScaffold
 
+/** 系统能力示例入口，集中导航到相机、IPC 和系统服务演示。 */
 @Route(path = DemoRouterPaths.SYSTEM_PAGE)
 class SystemServiceMainActivity : ComponentActivity() {
 
@@ -64,7 +65,7 @@ class SystemServiceMainActivity : ComponentActivity() {
                                 .navigation(this@SystemServiceMainActivity)
                         }
                     ) {
-                        Text("进程通讯-Messenger")
+                        Text("进程通信：Messenger / AIDL")
                     }
 
                     Button(

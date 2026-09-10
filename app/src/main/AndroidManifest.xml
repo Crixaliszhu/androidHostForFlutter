@@ -42,6 +42,15 @@
             android:name=".anrdemo.AnrDemoService"
             android:exported="false" />
 
+        <!-- 私有远程进程只服务当前应用，不能导出给其他 UID 绑定。 -->
+        <service
+            android:name=".ipc.aidl.AidlDemoService"
+            android:process=":aidl_demo"
+            android:exported="false" />
+        <activity
+            android:name=".ipc.aidl.AidlDemoActivity"
+            android:exported="false" />
+
         <receiver
             android:name=".anrdemo.AnrDemoReceiver"
             android:exported="false" />

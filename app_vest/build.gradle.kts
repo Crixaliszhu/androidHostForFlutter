@@ -70,6 +70,8 @@ android {
             // 马甲包复用主 app 的代码、Manifest、资源和 assets，再用 app_vest/src/main/res 覆盖外壳资源。
             manifest.srcFile("../app/src/main/AndroidManifest.xml")
             java.srcDirs("../app/src/main/java")
+            // 马甲包复用 AIDL 接口，否则共享的客户端源码找不到生成的 Stub。
+            aidl.srcDirs("../app/src/main/aidl")
             res.srcDirs("../app/src/main/res", "src/main/res")
             assets.srcDirs("../app/src/main/assets")
         }
@@ -135,6 +137,7 @@ android {
     }
 
     buildFeatures {
+        aidl = true
         viewBinding = true
         dataBinding = true
         compose = true

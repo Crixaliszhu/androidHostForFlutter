@@ -30,6 +30,9 @@ class IpcDemoActivity : AppCompatActivity() {
     }
 
     private fun initAction(){
+        _binding.btnAidl.setOnClickListener {
+            startActivity(android.content.Intent(this, com.example.hybriddemo.ipc.aidl.AidlDemoActivity::class.java))
+        }
         _binding.btnMessager.setOnClickListener {
             // 启动服务
             startMessenger()

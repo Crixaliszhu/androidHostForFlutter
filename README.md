@@ -1,5 +1,7 @@
 # 原生 + Flutter 混合教学 Demo 设计
 
+- [AIDL 同应用双进程通信完整示例](docs/AIDL同应用双进程通信示例.md)：从 IPC 演示页进入，包含回调、并发、任务取消、超时、死亡重连、FD 大数据传输和设备测试。
+
 ## 背景
 
 当前仓库包含真实生产工程 `recruitment_android`、Flutter Module `easy_job_module`，以及一个独立演示工程 `FlutterHybridDemo`。本次目标是在 `FlutterHybridDemo` 基础上沉淀一个“教学型 demo + 保持可运行”的原生 + Flutter 混合项目，用最小代码演示生产工程里用到的核心混合开发知识点。
